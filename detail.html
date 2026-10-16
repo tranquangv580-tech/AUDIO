@@ -286,40 +286,6 @@
         .audio-container-box::-webkit-scrollbar { width: 4px; }
         .audio-container-box::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
 
-        .list-group-card {
-            background: rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            overflow: hidden;
-        }
-
-        body.light-theme .list-group-card {
-            background: rgba(255, 255, 255, 0.5);
-        }
-
-        .list-group-header {
-            padding: 12px 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--text-primary);
-        }
-
-        .list-group-header:active { background: var(--card-hover); }
-
-        .list-group-body {
-            padding: 8px 10px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border-top: 1px solid var(--card-border);
-        }
-
-        .list-group-body.collapsed { display: none; }
-
         .episode-item {
             display: flex;
             align-items: center;
@@ -391,7 +357,7 @@
         .play-btn:active { transform: scale(0.92); }
         .play-btn svg { width: 12px; height: 12px; fill: currentColor; }
 
-        /* Streaming Audio Player Bar fixed at bottom */
+        /* Audio Player Bar */
         .audio-player-bar {
             position: fixed;
             bottom: 0;
@@ -557,15 +523,18 @@
         }
         .sheet-option-btn:hover { background: var(--card-hover); border-color: var(--accent); }
         .sheet-option-btn svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2.2; }
+        .sheet-option-btn.danger { color: #f43f5e; border-color: rgba(244,63,94,0.3); }
+        .sheet-option-btn.danger svg { stroke: #f43f5e; }
 
         .form-group { margin-bottom: 14px; }
         .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; }
-        .form-input, .form-select {
+        .form-input, .form-textarea, .form-select {
             width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
             color: var(--text-primary); padding: 12px; border-radius: 12px; font-size: 13px;
             font-family: var(--font-main); outline: none;
         }
-        .form-input:focus, .form-select:focus { border-color: var(--accent); }
+        .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--accent); }
+        .form-textarea { resize: vertical; min-height: 80px; }
 
         .file-upload-wrapper {
             position: relative;
@@ -648,8 +617,8 @@
                 <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg id="themeIconSun" viewBox="0 0 24 24" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             </button>
-            <button class="icon-btn danger" onclick="confirmDeleteStory()" title="Xóa bộ truyện">
-                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <button class="icon-btn danger" onclick="openTrashMenu()" title="Thùng rác & Xóa dữ liệu">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
             </button>
         </div>
     </div>
@@ -681,10 +650,19 @@
         <div class="empty-audio">Đang tải danh sách tập...</div>
     </div>
 
-    <!-- Nút thêm tập audio nổi -->
+    <!-- Nút thêm tập audio nổi (+) -->
     <button class="fab-btn" onclick="openActionModal()" title="Thêm tập audio">
         <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
+
+    <!-- Thanh xóa hàng loạt (Batch Deleting Bar) -->
+    <div class="batch-bar" id="batchBar">
+        <span id="selectedCountText" style="font-size: 12px; font-weight: 700;">Đã chọn 0 tập</span>
+        <div style="display: flex; gap: 6px;">
+            <button onclick="cancelSelectionMode()" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 12px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 11px;">Hủy</button>
+            <button onclick="executeDeleteSelectedEpisodes()" style="background: var(--accent); color: #fff; border: none; padding: 6px 12px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 11px;">Xóa đã chọn</button>
+        </div>
+    </div>
 
     <!-- Thanh phát nhạc Audio Streaming / Offline -->
     <div class="audio-player-bar" id="audioPlayerBar">
@@ -703,53 +681,104 @@
         </div>
     </div>
 
-    <!-- Modal Chọn Thao Tác Thêm Tập Audio -->
-    <div class="modal-overlay" id="actionModalOverlay" onclick="closeActionModal()"></div>
-    <div class="bottom-sheet" id="actionModalSheet">
+    <!-- Modal Nền (Overlay) -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+    <!-- 1. Modal Thùng Rác (Trash Menu) -->
+    <div class="bottom-sheet" id="trashMenuSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Thêm Tập Audio Mới</h3>
-            <button class="close-btn" onclick="closeActionModal()">&times;</button>
+            <h3 class="sheet-title">Quản Lý Thùng Rác</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
-        <button class="sheet-option-btn" onclick="openSingleUploadModal()">
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Tải lên file Audio (MP3, WAV, M4A) lưu ngoại tuyến
+        <button class="sheet-option-btn" onclick="startDeleteEpisodesMode()">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Xóa tập audio chọn
         </button>
-        <button class="sheet-option-btn" onclick="openBatchUploadModal()">
-            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-            Tải lên nhiều tập / Thêm theo chương
+        <button class="sheet-option-btn danger" onclick="openConfirmDeleteStoryModal()">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Xóa toàn bộ truyện
         </button>
     </div>
 
-    <!-- Modal Tải Lên Đơn Lẻ (Hỗ trợ ngoại tuyến Offline 100%) -->
+    <!-- Xác nhận xóa toàn bộ truyện -->
+    <div class="bottom-sheet" id="confirmDeleteStorySheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title" style="color: #f43f5e;">Xác Nhận Xóa Truyện</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+            Bạn có chắc chắn muốn xóa vĩnh viễn bộ tiểu thuyết này cùng toàn bộ audio ngoại tuyến không? Thao tác này không thể hoàn tác!
+        </p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeAllModals()" style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 13px;">Hủy</button>
+            <button onclick="executeDeleteStory()" style="flex: 1; background: #f43f5e; color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 13px;">Xóa Ngay</button>
+        </div>
+    </div>
+
+    <!-- 2. Modal Dấu Cộng (+) -->
+    <div class="bottom-sheet" id="actionModalSheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Thêm & Quản Lý</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
+        <button class="sheet-option-btn" onclick="openSingleUploadModal()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Thêm tập audio mới (Tải lên từ máy)
+        </button>
+        <button class="sheet-option-btn" onclick="openEditStoryModal()">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Thay đổi thông tin truyện
+        </button>
+    </div>
+
+    <!-- Modal Tải Lên Audio Đơn Lẻ (Đã loại bỏ phần chọn nhóm/chương, tối ưu iOS & kiểm tra đầy bộ nhớ) -->
     <div class="bottom-sheet" id="singleUploadSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Thêm File Audio (Nghe Không Cần Mạng)</h3>
-            <button class="close-btn" onclick="closeSingleUploadModal()">&times;</button>
+            <h3 class="sheet-title">Tải Lên File Audio Ngoại Tuyến</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
         <div class="form-group">
-            <label class="form-label">Tên tập / Chương truyện</label>
-            <input type="text" class="form-input" id="singleEpisodeName" placeholder="VD: Chương 01: Khởi Đầu">
+            <label class="form-label">Tên tập audio</label>
+            <input type="text" class="form-input" id="singleEpisodeName" placeholder="VD: Tập 1: Khởi đầu">
         </div>
         <div class="form-group">
-            <label class="form-label">Chọn Chương / Nhóm hiển thị</label>
-            <select class="form-select" id="singleEpisodeGroup">
-                <option value="Phần 1: Khởi Đầu">Phần 1: Khởi Đầu</option>
-                <option value="Phần 2: Cao Trào">Phần 2: Cao Trào</option>
-                <option value="Phần 3: Kết Thúc">Phần 3: Kết Thúc</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Tệp Audio (Lưu trực tiếp vào trình duyệt để nghe offline)</label>
+            <label class="form-label">Chọn tệp âm thanh trên điện thoại</label>
             <div class="file-upload-wrapper">
                 <label class="file-upload-btn" for="singleAudioFileInput">
                     <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    <span id="singleFileNameLabel">Chạm để chọn file Audio</span>
+                    <span id="singleFileNameLabel">Chọn tệp MP3, M4A, WAV...</span>
                 </label>
-                <input type="file" id="singleAudioFileInput" class="file-input-hidden" accept="audio/*" onchange="handleAudioFileSelected(this)">
+                <!-- Hỗ trợ tối ưu iOS & Android -->
+                <input type="file" id="singleAudioFileInput" class="file-input-hidden" accept="audio/*,.mp3,.m4a,.wav,.aac,.ogg" onchange="handleAudioFileSelected(this)">
             </div>
-            <div class="upload-progress" id="uploadProgressText">Đang xử lý lưu trữ ngoại tuyến...</div>
+            <div class="upload-progress" id="uploadProgressText">⏳ Đang xử lý file...</div>
         </div>
         <button class="submit-btn" id="saveSingleEpisodeBtn" onclick="saveSingleAudioEpisode()" disabled>Lưu Tập Audio</button>
+    </div>
+
+    <!-- Modal Thay Đổi Thông Tin Truyện -->
+    <div class="bottom-sheet" id="editStorySheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Thay Đổi Thông Tin Truyện</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tên tiểu thuyết</label>
+            <input type="text" class="form-input" id="editStoryNameInput">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tác giả</label>
+            <input type="text" class="form-input" id="editStoryAuthorInput">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Ảnh bìa mới (Tùy chọn)</label>
+            <input type="file" class="form-input" id="editStoryCoverInput" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tóm tắt nội dung</label>
+            <textarea class="form-textarea" id="editStorySummaryInput"></textarea>
+        </div>
+        <button class="submit-btn" onclick="saveStoryInfoChanges()">Lưu Thay Đổi</button>
     </div>
 
     <!-- Toast Thông Báo -->
@@ -774,7 +803,7 @@
             localStorage.setItem('appTheme', isLight ? 'light' : 'dark');
             document.getElementById('themeIconMoon').style.display = isLight ? 'none' : 'block';
             document.getElementById('themeIconSun').style.display = isLight ? 'block' : 'none';
-            showToast(isLight ? 'Đã chuyển sang Chế độ Ban Ngày ☀️' : 'Đã chuyển sang Chế độ Ban Đêm 🌙');
+            showToast(isLight ? 'Chế độ Ban Ngày ☀️' : 'Chế độ Ban Đêm 🌙');
         }
 
         function showToast(message) {
@@ -794,6 +823,8 @@
         let currentStoryId = localStorage.getItem('currentStoryId');
         let currentStory = null;
         let selectedAudioBase64 = '';
+        let isSelectingMode = false;
+        let selectedEpisodesSet = new Set();
         
         let audioElement = new Audio();
         let isPlaying = false;
@@ -832,7 +863,7 @@
                 return true;
             } catch (e) {
                 console.error(e);
-                showToast('Bộ nhớ ngoại tuyến đã đầy! Không thể lưu thêm file lớn.');
+                showToast('Bộ nhớ ngoại tuyến đã đầy! Không thể lưu thêm file.');
                 return false;
             }
         }
@@ -866,45 +897,40 @@
                 return;
             }
 
-            // Nhóm theo phần/chương
-            const groups = {};
-            episodes.forEach((ep, idx) => {
-                const groupName = ep.group || 'Phần 1: Khởi Đầu';
-                if (!groups[groupName]) groups[groupName] = [];
-                groups[groupName].push({ ...ep, originalIndex: idx });
-            });
-
-            let html = '';
-            for (const [groupName, eps] of Object.entries(groups)) {
-                html += `
-                    <div class="list-group-card">
-                        <div class="list-group-header" onclick="toggleGroup(this)">
-                            <span>📁 ${escapeHtml(groupName)} (${eps.length})</span>
-                            <span>▼</span>
+            container.innerHTML = episodes.map((ep, idx) => {
+                const isChecked = selectedEpisodesSet.has(idx);
+                return `
+                    <div class="episode-item" id="ep_item_${idx}">
+                        <div class="episode-checkbox ${isChecked ? 'checked' : ''}" onclick="toggleSelectEpisode(${idx})"></div>
+                        <div class="episode-info" onclick="handleEpisodeClick(${idx})">
+                            <h4 class="episode-name">${escapeHtml(ep.name)}</h4>
+                            <p class="episode-date">💾 Ngoại tuyến • ${ep.date || 'Gần đây'}</p>
                         </div>
-                        <div class="list-group-body">
-                            ${eps.map(ep => `
-                                <div class="episode-item">
-                                    <div class="episode-info" onclick="playEpisode('${ep.originalIndex}')">
-                                        <h4 class="episode-name">${escapeHtml(ep.name)}</h4>
-                                        <p class="episode-date">💾 Đã lưu ngoại tuyến • ${ep.date || 'Gần đây'}</p>
-                                    </div>
-                                    <button class="play-btn" onclick="playEpisode('${ep.originalIndex}')">
-                                        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                        Nghe
-                                    </button>
-                                </div>
-                            `).join('')}
-                        </div>
+                        <button class="play-btn" onclick="playEpisode(${idx})">
+                            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Nghe
+                        </button>
                     </div>
                 `;
-            }
-            container.innerHTML = html;
+            }).join('');
         }
 
-        function toggleGroup(headerEl) {
-            const bodyEl = headerEl.nextElementSibling;
-            bodyEl.classList.toggle('collapsed');
+        function handleEpisodeClick(idx) {
+            if (isSelectingMode) {
+                toggleSelectEpisode(idx);
+            } else {
+                playEpisode(idx);
+            }
+        }
+
+        function toggleSelectEpisode(idx) {
+            if (selectedEpisodesSet.has(idx)) {
+                selectedEpisodesSet.delete(idx);
+            } else {
+                selectedEpisodesSet.add(idx);
+            }
+            document.getElementById('selectedCountText').textContent = `Đã chọn ${selectedEpisodesSet.size} tập`;
+            renderEpisodes();
         }
 
         function playEpisode(index) {
@@ -952,49 +978,119 @@
 
         function closeAudioPlayer() {
             audioElement.pause();
-            audioPlayerBar.classList.remove('active');
+            document.getElementById('audioPlayerBar').classList.remove('active');
             isPlaying = false;
         }
 
+        // Modal & Sheets Controller
+        function closeAllModals() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.querySelectorAll('.bottom-sheet').forEach(sheet => sheet.classList.remove('active'));
+        }
+
+        function openTrashMenu() {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('trashMenuSheet').classList.add('active');
+        }
+
+        function openConfirmDeleteStoryModal() {
+            closeAllModals();
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('confirmDeleteStorySheet').classList.add('active');
+        }
+
         function openActionModal() {
-            document.getElementById('actionModalOverlay').classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('actionModalSheet').classList.add('active');
         }
 
-        function closeActionModal() {
-            document.getElementById('actionModalOverlay').classList.remove('active');
-            document.getElementById('actionModalSheet').classList.remove('active');
-        }
-
         function openSingleUploadModal() {
-            closeActionModal();
-            document.getElementById('actionModalOverlay').classList.add('active');
+            closeAllModals();
+            document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('singleUploadSheet').classList.add('active');
-        }
-
-        function closeSingleUploadModal() {
-            document.getElementById('actionModalOverlay').classList.remove('active');
-            document.getElementById('singleUploadSheet').classList.remove('active');
             document.getElementById('singleEpisodeName').value = '';
             document.getElementById('singleAudioFileInput').value = '';
-            document.getElementById('singleFileNameLabel').textContent = 'Chạm để chọn file Audio';
+            document.getElementById('singleFileNameLabel').textContent = 'Chọn tệp MP3, M4A, WAV...';
+            document.getElementById('uploadProgressText').style.display = 'none';
             document.getElementById('saveSingleEpisodeBtn').disabled = true;
             selectedAudioBase64 = '';
         }
 
-        function openBatchUploadModal() {
-            closeActionModal();
-            openSingleUploadModal(); // Sử dụng chung giao diện tải lên thông minh
+        function openEditStoryModal() {
+            closeAllModals();
+            document.getElementById('editStoryNameInput').value = currentStory.name || '';
+            document.getElementById('editStoryAuthorInput').value = currentStory.author || '';
+            document.getElementById('editStorySummaryInput').value = currentStory.summary || '';
+            document.getElementById('editStoryCoverInput').value = '';
+
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('editStorySheet').classList.add('active');
         }
 
+        // Xóa tập audio chọn
+        function startDeleteEpisodesMode() {
+            closeAllModals();
+            if (!currentStory.episodes || currentStory.episodes.length === 0) {
+                showToast('Không có tập audio nào để xóa!');
+                return;
+            }
+            isSelectingMode = true;
+            selectedEpisodesSet.clear();
+            document.body.classList.add('selecting-mode');
+            document.getElementById('batchBar').classList.add('active');
+            renderEpisodes();
+            showToast('Chạm vào các tập audio cần xóa rồi bấm "Xóa đã chọn"');
+        }
+
+        function cancelSelectionMode() {
+            isSelectingMode = false;
+            selectedEpisodesSet.clear();
+            document.body.classList.remove('selecting-mode');
+            document.getElementById('batchBar').classList.remove('active');
+            renderEpisodes();
+        }
+
+        function executeDeleteSelectedEpisodes() {
+            if (selectedEpisodesSet.size === 0) {
+                showToast('Chưa chọn tập nào để xóa!');
+                return;
+            }
+
+            currentStory.episodes = currentStory.episodes.filter((_, idx) => !selectedEpisodesSet.has(idx));
+            let stories = getStoriesFromStorage();
+            const idx = stories.findIndex(s => s.id === currentStory.id);
+            if (idx !== -1) {
+                stories[idx] = currentStory;
+                if (saveStoriesToStorage(stories)) {
+                    showToast('Đã xóa các tập đã chọn!');
+                    cancelSelectionMode();
+                    loadStoryDetails();
+                }
+            }
+        }
+
+        // Xóa toàn bộ truyện
+        function executeDeleteStory() {
+            let stories = getStoriesFromStorage();
+            stories = stories.filter(s => s.id !== currentStoryId);
+            if (saveStoriesToStorage(stories)) {
+                showToast('Đã xóa bộ truyện thành công!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 800);
+            }
+        }
+
+        // Xử lý file Audio cho iOS & Android
         async function handleAudioFileSelected(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
                 document.getElementById('singleFileNameLabel').textContent = file.name;
-                if (!document.getElementById('singleEpisodeName').value) {
+                if (!document.getElementById('singleEpisodeName').value.trim()) {
                     document.getElementById('singleEpisodeName').value = file.name.replace(/\.[^/.]+$/, "");
                 }
                 document.getElementById('uploadProgressText').style.display = 'block';
+                document.getElementById('uploadProgressText').textContent = '⏳ Đang mã hóa file lưu ngoại tuyến...';
                 document.getElementById('saveSingleEpisodeBtn').disabled = true;
 
                 try {
@@ -1020,8 +1116,6 @@
 
         function saveSingleAudioEpisode() {
             const name = document.getElementById('singleEpisodeName').value.trim();
-            const group = document.getElementById('singleEpisodeGroup').value;
-
             if (!name) {
                 showToast('Vui lòng nhập tên tập audio!');
                 return;
@@ -1034,7 +1128,6 @@
             const newEpisode = {
                 id: 'ep_' + Date.now(),
                 name: name,
-                group: group,
                 date: new Date().toLocaleDateString('vi-VN'),
                 audioData: selectedAudioBase64
             };
@@ -1047,22 +1140,45 @@
             if (idx !== -1) {
                 stories[idx] = currentStory;
                 if (saveStoriesToStorage(stories)) {
-                    closeSingleUploadModal();
+                    closeAllModals();
                     loadStoryDetails();
                     showToast('Đã lưu tập audio ngoại tuyến thành công!');
                 }
             }
         }
 
-        function confirmDeleteStory() {
-            if (confirm('Bạn có chắc chắn muốn xóa bộ tiểu thuyết này cùng toàn bộ audio ngoại tuyến không?')) {
-                let stories = getStoriesFromStorage();
-                stories = stories.filter(s => s.id !== currentStoryId);
+        // Lưu thay đổi thông tin truyện
+        async function saveStoryInfoChanges() {
+            const name = document.getElementById('editStoryNameInput').value.trim();
+            const author = document.getElementById('editStoryAuthorInput').value.trim();
+            const summary = document.getElementById('editStorySummaryInput').value.trim();
+            const coverInput = document.getElementById('editStoryCoverInput');
+
+            if (!name) {
+                showToast('Vui lòng nhập tên tiểu thuyết!');
+                return;
+            }
+
+            currentStory.name = name;
+            currentStory.author = author || 'Đang cập nhật';
+            currentStory.summary = summary || 'Chưa có tóm tắt.';
+
+            if (coverInput.files && coverInput.files[0]) {
+                try {
+                    currentStory.cover = await fileToBase64(coverInput.files[0]);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            let stories = getStoriesFromStorage();
+            const idx = stories.findIndex(s => s.id === currentStory.id);
+            if (idx !== -1) {
+                stories[idx] = currentStory;
                 if (saveStoriesToStorage(stories)) {
-                    showToast('Đã xóa bộ truyện thành công!');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 800);
+                    closeAllModals();
+                    loadStoryDetails();
+                    showToast('Đã cập nhật thông tin truyện thành công!');
                 }
             }
         }
