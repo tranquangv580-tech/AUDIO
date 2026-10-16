@@ -79,7 +79,7 @@
 
         * {
             box-sizing: border-box;
-            transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, transform 0.2s ease;
+            transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -101,6 +101,36 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Lưới căn chỉnh (Grid Lines) khi bật chế độ chỉnh sửa giao diện */
+        .layout-grid-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            display: none;
+            background-image: 
+                linear-gradient(to right, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(244, 63, 94, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        body.customizing-layout .layout-grid-overlay { display: block; }
+        body.customizing-layout .player-module {
+            outline: 2px dashed var(--accent);
+            cursor: move;
+            position: relative;
+        }
+        body.customizing-layout .player-module::after {
+            content: '⋮⋮ Kéo/Sắp xếp';
+            position: absolute;
+            top: 4px; right: 8px;
+            font-size: 10px;
+            background: var(--accent);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
         .sky-decorations {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -110,7 +140,7 @@
         .moon {
             position: absolute; top: 40px; right: 8%; width: 60px; height: 60px;
             border-radius: 50%; box-shadow: -10px 8px 0 2px #fef08a, 0 0 20px rgba(254, 240, 138, 0.25);
-            opacity: 0.9; transition: opacity 0.5s ease;
+            opacity: 0.9;
         }
 
         .stars {
@@ -120,33 +150,14 @@
                 radial-gradient(1.5px 1.5px at 80px 120px, #fef08a, rgba(0,0,0,0)),
                 radial-gradient(2px 2px at 200px 70px, #ffffff, rgba(0,0,0,0));
             background-size: 500px 500px; opacity: 0.7;
-            animation: twinkle 4s infinite alternate ease-in-out;
         }
-
-        @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 0.9; } }
-
-        .sun-glow {
-            position: absolute; top: -50px; right: -30px; width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(253, 224, 71, 0.4) 0%, rgba(253, 186, 116, 0.15) 50%, rgba(255,255,255,0) 70%);
-            border-radius: 50%; opacity: 0; transition: opacity 0.5s ease;
-        }
-
-        .clouds {
-            position: absolute; inset: 0;
-            background-image: 
-                radial-gradient(50px 25px at 60px 80px, rgba(255, 255, 255, 0.8), rgba(255,255,255,0)),
-                radial-gradient(70px 35px at 280px 140px, rgba(255, 255, 255, 0.7), rgba(255,255,255,0));
-            opacity: 0; transition: opacity 0.5s ease;
-        }
-
-        body.light-theme .moon, body.light-theme .stars { opacity: 0; }
-        body.light-theme .sun-glow, body.light-theme .clouds { opacity: 1; }
 
         .app-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 16px;
+            z-index: 10;
         }
 
         .header-actions {
@@ -162,7 +173,6 @@
             border: 1px solid var(--card-border);
             background: var(--card-bg);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             color: var(--text-primary);
             display: flex;
             align-items: center;
@@ -172,9 +182,9 @@
             text-decoration: none;
             flex-shrink: 0;
         }
-
         .icon-btn:active { transform: scale(0.92); }
         .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-btn.active-custom { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .style-select {
             background: var(--card-bg);
@@ -189,9 +199,8 @@
             cursor: pointer;
             box-shadow: 0 4px 12px var(--shadow-color);
         }
-        .style-select option { background: var(--bg-fallback); color: var(--text-primary); }
 
-        /* Khung đếm ngược hẹn giờ nhỏ xinh ở trên cùng */
+        /* Khung đếm ngược hẹn giờ ở trên cùng */
         .sleep-timer-badge {
             display: none;
             align-items: center;
@@ -204,30 +213,53 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 800;
-            margin: 0 auto 14px auto;
+            margin: 0 auto 12px auto;
             width: fit-content;
             box-shadow: 0 4px 12px var(--shadow-color);
-            animation: pulse-slow 2s infinite ease-in-out;
         }
-        @keyframes pulse-slow { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
-        /* Phần Trên: Ảnh bìa & Tên truyện */
+        /* Thông báo lịch sử nghe trước đó (Bấm vào để nhảy tới) */
+        .history-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            padding: 10px 14px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            cursor: pointer;
+            animation: bounce-in 0.3s ease;
+        }
+        .history-banner:hover { background: var(--card-hover); }
+
+        /* Khung chính chứa các module linh hoạt */
+        .player-container-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex: 1;
+        }
+
+        /* Module 1: Ảnh bìa & Tên (Cover & Title) */
         .player-top-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            margin-bottom: 20px;
         }
 
         .player-cover-container {
-            width: 170px;
-            height: 235px;
-            border-radius: 20px;
+            width: 150px;
+            height: 210px;
+            border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 12px 30px var(--shadow-color);
+            box-shadow: 0 10px 25px var(--shadow-color);
             border: 1px solid var(--card-border);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             background: rgba(0,0,0,0.2);
         }
 
@@ -238,7 +270,7 @@
         }
 
         .player-story-title {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 800;
             margin: 0 0 4px 0;
             color: var(--text-primary);
@@ -251,37 +283,39 @@
             margin: 0;
         }
 
-        /* Phần Dưới: Tiến trình & Điều khiển */
+        /* Module 2: Điều khiển & Tiến trình */
         .player-bottom-section {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
             border-radius: 28px;
-            padding: 20px;
+            padding: 18px;
             box-shadow: 0 8px 32px var(--shadow-color);
             margin-top: auto;
         }
 
-        /* Thanh tiến trình với cục tròn (thumb) */
+        /* Thanh tiến trình kéo trượt mượt mà */
         .progress-container {
             width: 100%;
-            height: 10px;
+            height: 12px;
             background: var(--card-border);
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             position: relative;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
+            touch-action: none;
         }
 
         .progress-bar {
             height: 100%;
             background: var(--accent);
             width: 0%;
-            border-radius: 5px;
+            border-radius: 6px;
             position: relative;
+            pointer-events: none;
         }
 
         .progress-thumb {
@@ -289,8 +323,8 @@
             right: -8px;
             top: 50%;
             transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #ffffff;
             border: 3px solid var(--accent);
@@ -303,23 +337,23 @@
             font-size: 12px;
             font-weight: 700;
             color: var(--text-secondary);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .controls-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 18px;
+            margin-bottom: 18px;
         }
 
         .control-btn {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            width: 48px;
-            height: 48px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -334,8 +368,8 @@
             background: var(--accent);
             color: #fff;
             border: none;
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -344,22 +378,21 @@
             box-shadow: 0 6px 20px var(--accent-bg);
         }
         .play-pause-btn:active { transform: scale(0.92); }
-        .play-pause-btn svg { width: 28px; height: 28px; fill: currentColor; }
+        .play-pause-btn svg { width: 26px; height: 26px; fill: currentColor; }
 
-        /* Các tính năng phụ */
         .features-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
             border-top: 1px solid var(--card-border);
-            padding-top: 16px;
+            padding-top: 14px;
         }
 
         .feature-item-btn {
             background: rgba(0,0,0,0.1);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            padding: 10px 8px;
+            padding: 10px 6px;
             border-radius: 14px;
             font-size: 11px;
             font-weight: 700;
@@ -421,7 +454,6 @@
             color: var(--text-primary); padding: 12px; border-radius: 12px; font-size: 13px;
             font-family: var(--font-main); outline: none;
         }
-        .form-input:focus { border-color: var(--accent); }
 
         .submit-btn {
             width: 100%; background: var(--accent); color: #ffffff; border: none;
@@ -451,11 +483,12 @@
 </head>
 <body>
 
+    <!-- Khung lưới hướng dẫn khi chỉnh sửa giao diện -->
+    <div class="layout-grid-overlay" id="layoutGridOverlay"></div>
+
     <div class="sky-decorations">
         <div class="moon"></div>
         <div class="stars"></div>
-        <div class="sun-glow"></div>
-        <div class="clouds"></div>
     </div>
 
     <div class="app-header">
@@ -463,13 +496,15 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Ô chọn phong cách -->
+            <!-- Nút bật chế độ Cài đặt giao diện (Layout Customizer) -->
+            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh bố cục giao diện">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
             <select class="style-select" id="themeStyleSelect" onchange="changeThemeStyle(this.value)" title="Chọn phong cách giao diện">
                 <option value="default">✨ Cơ bản</option>
                 <option value="starry">🌌 Trời sao</option>
                 <option value="ocean">🌊 Đại dương đêm</option>
             </select>
-            <!-- Nút đổi Ngày / Đêm -->
             <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Ngày / Đêm">
                 <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 <svg id="themeIconSun" viewBox="0 0 24 24" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -483,54 +518,65 @@
         <span id="sleepCountdownText">0:00:00</span>
     </div>
 
-    <!-- Phần Trên: Ảnh bìa & Tên truyện -->
-    <div class="player-top-section">
-        <div class="player-cover-container">
-            <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
-        </div>
-        <h2 class="player-story-title" id="playerStoryTitle">Đang tải tên truyện...</h2>
-        <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
+    <!-- Thông báo lịch sử nghe trước đó -->
+    <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
+        <span id="historyBannerText">📜 Có lịch sử nghe trước đó. Bấm vào để tiếp tục!</span>
+        <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
     </div>
 
-    <!-- Phần Dưới: Tiến trình & Điều khiển -->
-    <div class="player-bottom-section">
-        <div class="progress-container" id="progressContainer" onclick="seekAudio(event)">
-            <div class="progress-bar" id="progressBar">
-                <div class="progress-thumb"></div>
+    <!-- Khung chính linh hoạt theo thứ tự sắp xếp của người dùng -->
+    <div class="player-container-flex" id="playerContainerFlex">
+        
+        <!-- Module 1: Ảnh bìa & Tên (Cover & Title) -->
+        <div class="player-top-section player-module" id="moduleCoverTitle" data-order="1">
+            <div class="player-cover-container">
+                <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
+            </div>
+            <h2 class="player-story-title" id="playerStoryTitle">Đang tải tên truyện...</h2>
+            <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
+        </div>
+
+        <!-- Module 2: Tiến trình & Điều khiển -->
+        <div class="player-bottom-section player-module" id="moduleControls" data-order="2">
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-thumb"></div>
+                </div>
+            </div>
+            <div class="time-info-row">
+                <span id="currentTimeText">0:00:00</span>
+                <span id="durationText">0:00:00</span>
+            </div>
+
+            <div class="controls-row">
+                <button class="control-btn" onclick="skipTime(-10)" title="Lùi 10 giây">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                </button>
+                <button class="play-pause-btn" onclick="togglePlayPause()" id="playPauseMainBtn">
+                    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                </button>
+                <button class="control-btn" onclick="skipTime(10)" title="Tới 10 giây">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                </button>
+            </div>
+
+            <div class="features-row">
+                <button class="feature-item-btn" onclick="openSpeedModal()">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="speedLabelBtn">Tốc độ: 1.0x</span>
+                </button>
+                <button class="feature-item-btn" onclick="openSleepTimerModal()">
+                    <svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                    <span>Hẹn giờ tắt</span>
+                </button>
+                <button class="feature-item-btn" onclick="openPlaylistModal()">
+                    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    <span>Danh sách tập</span>
+                </button>
             </div>
         </div>
-        <div class="time-info-row">
-            <span id="currentTimeText">0:00:00</span>
-            <span id="durationText">0:00:00</span>
-        </div>
 
-        <div class="controls-row">
-            <button class="control-btn" onclick="skipTime(-10)" title="Lùi 10 giây">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
-            </button>
-            <button class="play-pause-btn" onclick="togglePlayPause()" id="playPauseMainBtn">
-                <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-            </button>
-            <button class="control-btn" onclick="skipTime(10)" title="Tới 10 giây">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
-            </button>
-        </div>
-
-        <div class="features-row">
-            <button class="feature-item-btn" onclick="openSpeedModal()">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                <span id="speedLabelBtn">Tốc độ: 1.0x</span>
-            </button>
-            <button class="feature-item-btn" onclick="openSleepTimerModal()">
-                <svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
-                <span>Hẹn giờ tắt</span>
-            </button>
-            <button class="feature-item-btn" onclick="openPlaylistModal()">
-                <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                <span>Danh sách tập</span>
-            </button>
-        </div>
     </div>
 
     <!-- Modals -->
@@ -656,37 +702,33 @@
         let currentStory = null;
 
         let audioElement = new Audio();
-        
-        // Tốc độ toàn cục (Global Speed)
         let currentPlaybackSpeed = parseFloat(localStorage.getItem('globalAudioSpeed') || '1.0');
-        
-        // Hẹn giờ tắt đếm ngược
         let sleepTimerInterval = null;
         let sleepTimerRemainingSeconds = 0;
+        let pendingHistoryTime = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            loadLayoutOrder();
             
-            // Áp dụng tốc độ đã lưu toàn cục
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
 
             loadStoryAndPlay();
 
+            // Lắng nghe sự kiện phát & tiến trình không bị kẹt
             audioElement.addEventListener('timeupdate', () => {
-                if (audioElement.duration) {
+                if (audioElement.duration && !isDraggingProgress) {
                     const pct = (audioElement.currentTime / audioElement.duration) * 100;
                     document.getElementById('progressBar').style.width = pct + '%';
                     document.getElementById('currentTimeText').textContent = formatTime(audioElement.currentTime);
                     document.getElementById('durationText').textContent = formatTime(audioElement.duration);
 
-                    // Lưu lịch sử vị trí nghe liên tục cho tập hiện tại
                     savePlaybackHistory(audioElement.currentTime);
                 }
             });
 
             audioElement.addEventListener('ended', () => {
-                // Xóa lịch sử tập hiện tại khi nghe xong
                 savePlaybackHistory(0);
                 if (currentStory && currentStory.episodes && currentEpisodeIndex < currentStory.episodes.length - 1) {
                     currentEpisodeIndex++;
@@ -699,7 +741,53 @@
                     showToast('Đã phát hết danh sách tập audio!');
                 }
             });
+
+            setupProgressScrubbing();
         });
+
+        // Kéo trượt thanh tiến trình bằng tay (Touch & Mouse support)
+        let isDraggingProgress = false;
+        function setupProgressScrubbing() {
+            const container = document.getElementById('progressContainer');
+
+            const updateScrub = (e) => {
+                const rect = container.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let pos = (clientX - rect.left) / rect.width;
+                pos = Math.min(Math.max(pos, 0), 1);
+                
+                if (audioElement.duration) {
+                    const previewTime = pos * audioElement.duration;
+                    document.getElementById('progressBar').style.width = (pos * 100) + '%';
+                    document.getElementById('currentTimeText').textContent = formatTime(previewTime);
+                }
+            };
+
+            container.addEventListener('pointerdown', (e) => {
+                isDraggingProgress = true;
+                container.setPointerCapture(e.pointerId);
+                updateScrub(e);
+            });
+
+            container.addEventListener('pointermove', (e) => {
+                if (isDraggingProgress) {
+                    updateScrub(e);
+                }
+            });
+
+            container.addEventListener('pointerup', (e) => {
+                if (isDraggingProgress) {
+                    isDraggingProgress = false;
+                    const rect = container.getBoundingClientRect();
+                    const clientX = e.clientX;
+                    let pos = (clientX - rect.left) / rect.width;
+                    pos = Math.min(Math.max(pos, 0), 1);
+                    if (audioElement.duration) {
+                        audioElement.currentTime = pos * audioElement.duration;
+                    }
+                }
+            });
+        }
 
         function getStoriesFromStorage() {
             try {
@@ -754,22 +842,24 @@
                     audioElement.src = audioUrl;
                     audioElement.playbackRate = currentPlaybackSpeed;
 
-                    // Khôi phục lịch sử vị trí nghe trước đó của tập này
+                    // Kiểm tra lịch sử nghe trước đó
                     const savedTime = parseFloat(localStorage.getItem(`history_${currentStoryId}_${currentEpisodeIndex}`) || '0');
                     
                     audioElement.onloadedmetadata = () => {
-                        if (savedTime > 0 && savedTime < audioElement.duration - 5) {
-                            audioElement.currentTime = savedTime;
-                            showToast(`Đã khôi phục vị trí nghe: ${formatTime(savedTime)}`);
+                        if (savedTime > 5) {
+                            pendingHistoryTime = savedTime;
+                            document.getElementById('historyBannerText').textContent = `📜 Có lịch sử nghe tại ${formatTime(savedTime)}. Bấm để tiếp tục!`;
+                            document.getElementById('historyBanner').style.display = 'flex';
                         }
                     };
 
+                    // Tự động phát ngay lập tức
                     audioElement.play().then(() => {
                         document.getElementById('playIcon').style.display = 'none';
                         document.getElementById('pauseIcon').style.display = 'block';
                     }).catch(err => {
-                        console.error(err);
-                        showToast('Trình duyệt chặn tự động phát. Hãy bấm nút Play.');
+                        console.error('Autoplay bị chặn:', err);
+                        showToast('Bấm nút Play để phát audio.');
                     });
                 };
             } catch (err) {
@@ -778,13 +868,20 @@
             }
         }
 
+        function jumpToHistoryTime() {
+            if (pendingHistoryTime > 0 && audioElement.duration) {
+                audioElement.currentTime = pendingHistoryTime;
+                showToast(`Đã nhảy tới vị trí: ${formatTime(pendingHistoryTime)}`);
+                document.getElementById('historyBanner').style.display = 'none';
+            }
+        }
+
         function savePlaybackHistory(time) {
-            if (currentStoryId && !isNaN(currentEpisodeIndex)) {
+            if (currentStoryId && !isNaN(currentEpisodeIndex) && time > 2) {
                 localStorage.setItem(`history_${currentStoryId}_${currentEpisodeIndex}`, time);
             }
         }
 
-        // Định dạng thời gian X:Y:Z (Giờ : Phút : Giây)
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds <= 0) return "0:00:00";
             const hrs = Math.floor(seconds / 3600);
@@ -808,15 +905,6 @@
         function skipTime(seconds) {
             if (audioElement.duration) {
                 audioElement.currentTime = Math.min(Math.max(audioElement.currentTime + seconds, 0), audioElement.duration);
-            }
-        }
-
-        function seekAudio(event) {
-            const container = document.getElementById('progressContainer');
-            const rect = container.getBoundingClientRect();
-            const pos = (event.clientX - rect.left) / rect.width;
-            if (audioElement.duration) {
-                audioElement.currentTime = pos * audioElement.duration;
             }
         }
 
@@ -845,7 +933,7 @@
             }
         }
 
-        // Hẹn giờ tắt & Đếm ngược X:Y:Z
+        // Hẹn giờ tắt & Đếm ngược
         function openSleepTimerModal() {
             closeAllModals();
             document.getElementById('modalOverlay').classList.add('active');
@@ -895,7 +983,6 @@
         }
 
         function updateSleepTimerDisplay() {
-            // Quy đổi giây còn lại thành định dạng X:Y:Z (Giờ : Phút : Giây)
             document.getElementById('sleepCountdownText').textContent = formatTime(sleepTimerRemainingSeconds);
         }
 
@@ -919,8 +1006,64 @@
         function selectEpisode(idx) {
             currentEpisodeIndex = idx;
             localStorage.setItem('currentEpisodeIndex', idx);
+            document.getElementById('historyBanner').style.display = 'none';
             closeAllModals();
             loadAndPlayCurrentEpisode();
+        }
+
+        // Tùy chỉnh bố cục giao diện với lưới căn chỉnh (Layout Customizer)
+        let isCustomizing = false;
+        function toggleLayoutCustomizer() {
+            isCustomizing = !isCustomizing;
+            const btn = document.getElementById('layoutToggleBtn');
+            const container = document.getElementById('playerContainerFlex');
+            
+            if (isCustomizing) {
+                document.body.classList.add('customizing-layout');
+                btn.classList.add('active-custom');
+                showToast('Đang bật chế độ chỉnh sửa giao diện. Chạm vào các module để hoán đổi vị trí!');
+                
+                // Cho phép bấm vào module để đổi vị trí lên/xuống
+                const modules = container.querySelectorAll('.player-module');
+                modules.forEach(mod => {
+                    mod.onclick = () => {
+                        if (!isCustomizing) return;
+                        // Đổi chỗ các module với nhau
+                        container.appendChild(mod);
+                        saveLayoutOrder();
+                        showToast('Đã sắp xếp lại bố cục!');
+                    };
+                });
+            } else {
+                document.body.classList.remove('customizing-layout');
+                btn.classList.remove('active-custom');
+                const modules = container.querySelectorAll('.player-module');
+                modules.forEach(mod => mod.onclick = null);
+                showToast('Đã lưu bố cục giao diện mới áp dụng toàn cục!');
+            }
+        }
+
+        function saveLayoutOrder() {
+            const container = document.getElementById('playerContainerFlex');
+            const modules = Array.from(container.querySelectorAll('.player-module'));
+            const orderIds = modules.map(m => m.id);
+            localStorage.setItem('playerLayoutOrder', JSON.stringify(orderIds));
+        }
+
+        function loadLayoutOrder() {
+            const saved = localStorage.getItem('playerLayoutOrder');
+            if (saved) {
+                try {
+                    const orderIds = JSON.parse(saved);
+                    const container = document.getElementById('playerContainerFlex');
+                    orderIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) container.appendChild(el);
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         }
 
         function closeAllModals() {
