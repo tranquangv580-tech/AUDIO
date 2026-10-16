@@ -103,49 +103,48 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Lưới căn chỉnh (Grid Lines) khi bật chế độ chỉnh sửa giao diện */
+        /* Chế độ chỉnh sửa giao diện hiển thị các nút điều hướng Lên / Xuống */
         .layout-grid-overlay {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 999;
-            display: none;
-            background-image: 
-                linear-gradient(to right, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(244, 63, 94, 0.15) 1px, transparent 1px);
+            position: fixed; inset: 0; pointer-events: none; z-index: 999; display: none;
+            background-image: linear-gradient(to right, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(244, 63, 94, 0.15) 1px, transparent 1px);
             background-size: 40px 40px;
         }
         body.customizing-layout .layout-grid-overlay { display: block; }
         body.customizing-layout .player-module {
             outline: 2px dashed var(--accent);
-            cursor: pointer;
             position: relative;
         }
-        body.customizing-layout .player-module::after {
-            content: '⋮⋮ Chạm để đổi vị trí';
+        .module-toolbar {
+            display: none;
             position: absolute;
-            top: 4px; right: 8px;
-            font-size: 10px;
+            top: 8px; right: 8px;
+            z-index: 10;
+            gap: 4px;
+        }
+        body.customizing-layout .module-toolbar { display: flex; }
+        .move-btn {
             background: var(--accent);
             color: #fff;
-            padding: 2px 6px;
+            border: none;
+            padding: 4px 8px;
             border-radius: 6px;
+            font-size: 11px;
             font-weight: 700;
-            pointer-events: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
+        .move-btn:active { transform: scale(0.9); }
 
         .sky-decorations {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none; z-index: -1; overflow: hidden;
         }
-
         .moon {
             position: absolute; top: 40px; right: 8%; width: 60px; height: 60px;
             border-radius: 50%; box-shadow: -10px 8px 0 2px #fef08a, 0 0 20px rgba(254, 240, 138, 0.25);
             opacity: 0.9;
         }
-
         .stars {
             position: absolute; inset: 0;
             background-image: 
@@ -156,289 +155,136 @@
         }
 
         .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            z-index: 10;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; z-index: 10;
         }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
+        .header-actions { display: flex; gap: 8px; align-items: center; }
         .icon-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 13px;
-            border: 1px solid var(--card-border);
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            text-decoration: none;
-            flex-shrink: 0;
+            width: 42px; height: 42px; border-radius: 13px; border: 1px solid var(--card-border);
+            background: var(--card-bg); backdrop-filter: blur(12px); color: var(--text-primary);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-color); text-decoration: none; flex-shrink: 0;
         }
         .icon-btn:active { transform: scale(0.92); }
         .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-btn.active-custom { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         .style-select {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 13px;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: var(--font-main);
-            outline: none;
-            cursor: pointer;
-            box-shadow: 0 4px 12px var(--shadow-color);
+            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary);
+            padding: 8px 12px; border-radius: 13px; font-size: 12px; font-weight: 700;
+            font-family: var(--font-main); outline: none; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
-        /* Khung đếm ngược hẹn giờ ở trên cùng */
         .sleep-timer-badge {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: var(--accent-bg);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 800;
-            margin: 0 auto 12px auto;
-            width: fit-content;
-            box-shadow: 0 4px 12px var(--shadow-color);
+            display: none; align-items: center; justify-content: center; gap: 6px;
+            background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
+            margin: 0 auto 12px auto; width: fit-content; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
-        /* Thông báo lịch sử nghe trước đó */
         .history-banner {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--card-bg);
-            border: 1px solid var(--accent);
-            padding: 10px 14px;
-            border-radius: 14px;
-            margin-bottom: 14px;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 6px 20px var(--shadow-color);
-            cursor: pointer;
+            display: none; align-items: center; justify-content: space-between;
+            background: var(--card-bg); border: 1px solid var(--accent); padding: 10px 14px;
+            border-radius: 14px; margin-bottom: 14px; font-size: 12px; font-weight: 700;
+            box-shadow: 0 6px 20px var(--shadow-color); cursor: pointer;
         }
         .history-banner:hover { background: var(--card-hover); }
 
-        /* Khung chính chứa các module linh hoạt */
-        .player-container-flex {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            flex: 1;
-        }
+        .player-container-flex { display: flex; flex-direction: column; gap: 16px; flex: 1; }
 
-        /* Module 1: Ảnh bìa & Tên */
-        .player-top-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
+        .player-top-section { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
         .player-cover-container {
-            width: 150px;
-            height: 210px;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px var(--shadow-color);
-            border: 1px solid var(--card-border);
-            margin-bottom: 12px;
-            background: rgba(0,0,0,0.2);
-            pointer-events: none;
+            width: 150px; height: 210px; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 25px var(--shadow-color); border: 1px solid var(--card-border);
+            margin-bottom: 12px; background: rgba(0,0,0,0.2); pointer-events: none;
         }
+        .player-cover { width: 100%; height: 100%; object-fit: cover; }
+        .player-story-title { font-size: 16px; font-weight: 800; margin: 0 0 4px 0; color: var(--text-primary); }
+        .player-episode-title { font-size: 13px; font-weight: 700; color: var(--accent); margin: 0; }
 
-        .player-cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .player-story-title {
-            font-size: 16px;
-            font-weight: 800;
-            margin: 0 0 4px 0;
-            color: var(--text-primary);
-        }
-
-        .player-episode-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent);
-            margin: 0;
-        }
-
-        /* Module 2: Điều khiển & Tiến trình */
         .player-bottom-section {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            padding: 18px;
-            box-shadow: 0 8px 32px var(--shadow-color);
-            margin-top: auto;
+            background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); border-radius: 28px; padding: 18px;
+            box-shadow: 0 8px 32px var(--shadow-color); margin-top: auto; position: relative;
         }
 
-        /* Thanh tiến trình kéo trượt mượt mà (Touch / Pointer Optimized) */
-        .progress-container {
+        /* Thanh tiến trình chuẩn HTML Range Slider siêu mượt */
+        .progress-slider {
             width: 100%;
-            height: 16px;
+            -webkit-appearance: none;
+            appearance: none;
             background: var(--card-border);
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
+            height: 10px;
+            border-radius: 5px;
+            outline: none;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            touch-action: none;
+            cursor: pointer;
         }
-
-        .progress-bar {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            border-radius: 8px;
-            position: relative;
-            pointer-events: none;
-        }
-
-        .progress-thumb {
-            position: absolute;
-            right: -8px;
-            top: 50%;
-            transform: translateY(-50%);
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
             width: 18px;
             height: 18px;
             border-radius: 50%;
             background: #ffffff;
             border: 3px solid var(--accent);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
 
         .time-info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
+            display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;
+            color: var(--text-secondary); margin-bottom: 16px;
         }
 
-        .controls-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-
+        .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; }
         .control-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px var(--shadow-color);
+            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary);
+            width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
         .control-btn:active { transform: scale(0.92); }
         .control-btn svg { width: 20px; height: 20px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; }
 
         .play-pause-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 6px 20px var(--accent-bg);
+            background: var(--accent); color: #fff; border: none; width: 60px; height: 60px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 6px 20px var(--accent-bg);
         }
         .play-pause-btn:active { transform: scale(0.92); }
         .play-pause-btn svg { width: 26px; height: 26px; fill: currentColor; }
 
         .features-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            border-top: 1px solid var(--card-border);
-            padding-top: 14px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            border-top: 1px solid var(--card-border); padding-top: 14px;
         }
-
         .feature-item-btn {
-            background: rgba(0,0,0,0.1);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 10px 6px;
-            border-radius: 14px;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: var(--font-main);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            text-align: center;
+            background: rgba(0,0,0,0.1); border: 1px solid var(--card-border); color: var(--text-primary);
+            padding: 10px 6px; border-radius: 14px; font-size: 11px; font-weight: 700;
+            font-family: var(--font-main); cursor: pointer; display: flex; flex-direction: column;
+            align-items: center; gap: 4px; text-align: center;
         }
         .feature-item-btn:hover { background: var(--card-hover); border-color: var(--accent); }
         .feature-item-btn svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; }
 
-        /* Modals */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            opacity: 0; visibility: hidden;
-            transition: all 0.3s ease;
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px);
+            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
 
         .bottom-sheet {
-            position: fixed; bottom: -100%; left: 0; width: 100%;
-            background: var(--bg-gradient);
-            border-radius: 24px 24px 0 0;
-            padding: 20px 16px max(30px, env(safe-area-inset-bottom));
-            box-sizing: border-box; z-index: 1001;
-            transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 80vh; overflow-y: auto;
-            border-top: 1px solid var(--card-border);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            max-width: 480px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--bg-gradient);
+            border-radius: 24px 24px 0 0; padding: 20px 16px max(30px, env(safe-area-inset-bottom));
+            box-sizing: border-box; z-index: 1001; transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 80vh; overflow-y: auto; border-top: 1px solid var(--card-border);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); max-width: 480px; left: 50%; transform: translateX(-50%);
         }
         .bottom-sheet.active { bottom: 0; }
 
         .sheet-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding-bottom: 10px;
-            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--card-border);
         }
         .sheet-title { font-size: 15px; font-weight: 800; margin: 0; color: var(--text-primary); }
         .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; padding: 0; }
@@ -486,7 +332,6 @@
 </head>
 <body>
 
-    <!-- Khung lưới hướng dẫn khi chỉnh sửa giao diện -->
     <div class="layout-grid-overlay" id="layoutGridOverlay"></div>
 
     <div class="sky-decorations">
@@ -499,7 +344,7 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Nút bật chế độ Cài đặt giao diện (Layout Customizer) -->
+            <!-- Nút bật chế độ Cài đặt giao diện (Dùng mũi tên Lên / Xuống) -->
             <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh bố cục giao diện">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
@@ -532,6 +377,10 @@
         
         <!-- Module 1: Ảnh bìa & Tên -->
         <div class="player-top-section player-module" id="moduleCoverTitle" data-order="1">
+            <div class="module-toolbar">
+                <button class="move-btn" onclick="moveModuleUp('moduleCoverTitle')">⬆ Lên</button>
+                <button class="move-btn" onclick="moveModuleDown('moduleCoverTitle')">⬇ Xuống</button>
+            </div>
             <div class="player-cover-container">
                 <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
             </div>
@@ -541,11 +390,13 @@
 
         <!-- Module 2: Điều khiển & Tiến trình -->
         <div class="player-bottom-section player-module" id="moduleControls" data-order="2">
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar">
-                    <div class="progress-thumb"></div>
-                </div>
+            <div class="module-toolbar">
+                <button class="move-btn" onclick="moveModuleUp('moduleControls')">⬆ Lên</button>
+                <button class="move-btn" onclick="moveModuleDown('moduleControls')">⬇ Xuống</button>
             </div>
+            <!-- Thanh tiến trình chuẩn Range Slider (mượt mà, không kẹt) -->
+            <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
+            
             <div class="time-info-row">
                 <span id="currentTimeText">0:00:00</span>
                 <span id="durationText">0:00:00</span>
@@ -709,6 +560,7 @@
         let sleepTimerInterval = null;
         let sleepTimerRemainingSeconds = 0;
         let pendingHistoryTime = 0;
+        let isUserSeeking = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
@@ -719,11 +571,12 @@
 
             loadStoryAndPlay();
 
-            // Lắng nghe sự kiện timeupdate liên tục cập nhật tiến trình chuẩn xác
+            // Lắng nghe liên tục thời gian audio để cập nhật thanh slider mượt mà tuyệt đối
             audioElement.addEventListener('timeupdate', () => {
-                if (audioElement.duration && !isDraggingProgress) {
+                if (audioElement.duration && !isUserSeeking) {
+                    const slider = document.getElementById('progressSlider');
                     const pct = (audioElement.currentTime / audioElement.duration) * 100;
-                    document.getElementById('progressBar').style.width = pct + '%';
+                    slider.value = pct;
                     document.getElementById('currentTimeText').textContent = formatTime(audioElement.currentTime);
                     document.getElementById('durationText').textContent = formatTime(audioElement.duration);
 
@@ -744,51 +597,23 @@
                     showToast('Đã phát hết danh sách tập audio!');
                 }
             });
-
-            setupProgressScrubbing();
         });
 
-        // Thanh tiến trình kéo trượt mượt mà (Touch & Pointer support hoàn thiện)
-        let isDraggingProgress = false;
-        function setupProgressScrubbing() {
-            const container = document.getElementById('progressContainer');
+        // Xử lý khi người dùng kéo trượt thanh tiến trình (Range Slider)
+        function onSliderInput(val) {
+            isUserSeeking = true;
+            if (audioElement.duration) {
+                const previewTime = (val / 100) * audioElement.duration;
+                document.getElementById('currentTimeText').textContent = formatTime(previewTime);
+            }
+        }
 
-            const updateScrub = (clientX) => {
-                const rect = container.getBoundingClientRect();
-                let pos = (clientX - rect.left) / rect.width;
-                pos = Math.min(Math.max(pos, 0), 1);
-                
-                if (audioElement.duration) {
-                    const previewTime = pos * audioElement.duration;
-                    document.getElementById('progressBar').style.width = (pos * 100) + '%';
-                    document.getElementById('currentTimeText').textContent = formatTime(previewTime);
-                }
-            };
-
-            container.addEventListener('pointerdown', (e) => {
-                if (isCustomizing) return;
-                isDraggingProgress = true;
-                container.setPointerCapture(e.pointerId);
-                updateScrub(e.clientX);
-            });
-
-            container.addEventListener('pointermove', (e) => {
-                if (isDraggingProgress) {
-                    updateScrub(e.clientX);
-                }
-            });
-
-            container.addEventListener('pointerup', (e) => {
-                if (isDraggingProgress) {
-                    isDraggingProgress = false;
-                    const rect = container.getBoundingClientRect();
-                    let pos = (e.clientX - rect.left) / rect.width;
-                    pos = Math.min(Math.max(pos, 0), 1);
-                    if (audioElement.duration) {
-                        audioElement.currentTime = pos * audioElement.duration;
-                    }
-                }
-            });
+        function onSliderChange(val) {
+            if (audioElement.duration) {
+                const newTime = (val / 100) * audioElement.duration;
+                audioElement.currentTime = newTime;
+            }
+            isUserSeeking = false;
         }
 
         function getStoriesFromStorage() {
@@ -1013,33 +838,38 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh bố cục giao diện (Layout Customizer)
+        // Tùy chỉnh bố cục giao diện bằng nút Lên / Xuống
         let isCustomizing = false;
         function toggleLayoutCustomizer() {
             isCustomizing = !isCustomizing;
             const btn = document.getElementById('layoutToggleBtn');
-            const container = document.getElementById('playerContainerFlex');
             
             if (isCustomizing) {
                 document.body.classList.add('customizing-layout');
                 btn.classList.add('active-custom');
-                showToast('Đang bật chế độ chỉnh sửa giao diện. Chạm vào các module để hoán đổi vị trí!');
-                
-                const modules = container.querySelectorAll('.player-module');
-                modules.forEach(mod => {
-                    mod.onclick = () => {
-                        if (!isCustomizing) return;
-                        container.appendChild(mod);
-                        saveLayoutOrder();
-                        showToast('Đã sắp xếp lại bố cục!');
-                    };
-                });
+                showToast('Đang bật chế độ chỉnh sửa giao diện. Dùng nút Lên/Xuống trên từng ô để dịch chuyển!');
             } else {
                 document.body.classList.remove('customizing-layout');
                 btn.classList.remove('active-custom');
-                const modules = container.querySelectorAll('.player-module');
-                modules.forEach(mod => mod.onclick = null);
                 showToast('Đã lưu bố cục giao diện mới áp dụng toàn cục!');
+            }
+        }
+
+        function moveModuleUp(moduleId) {
+            const el = document.getElementById(moduleId);
+            if (el && el.previousElementSibling && el.previousElementSibling.classList.contains('player-module')) {
+                el.parentNode.insertBefore(el, el.previousElementSibling);
+                saveLayoutOrder();
+                showToast('Đã di chuyển lên!');
+            }
+        }
+
+        function moveModuleDown(moduleId) {
+            const el = document.getElementById(moduleId);
+            if (el && el.nextElementSibling && el.nextElementSibling.classList.contains('player-module')) {
+                el.parentNode.insertBefore(el.nextElementSibling, el);
+                saveLayoutOrder();
+                showToast('Đã di chuyển xuống!');
             }
         }
 
