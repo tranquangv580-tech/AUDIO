@@ -631,7 +631,7 @@
             <p class="story-author" id="storyAuthorText">---</p>
             <div class="story-meta-row">
                 <span class="badge" id="storyEpisodeCountBadge">0 tập audio</span>
-                <span class="badge badge-secondary" id="offlineStatusBadge">💾 Sẵn sàng Offline</span>
+                <span class="badge badge-secondary" id="offlineStatusBadge">💾 Lưu trực tiếp IndexedDB</span>
             </div>
         </div>
     </div>
@@ -731,10 +731,10 @@
         </button>
     </div>
 
-    <!-- Modal Tải Lên Audio Đơn Lẻ (Đã loại bỏ phần chọn nhóm/chương, tối ưu iOS & kiểm tra đầy bộ nhớ) -->
+    <!-- Modal Tải Lên Audio Đơn Lẻ (Sử dụng IndexedDB lưu file gốc trực tiếp từ máy) -->
     <div class="bottom-sheet" id="singleUploadSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Tải Lên File Audio Ngoại Tuyến</h3>
+            <h3 class="sheet-title">Tải Lên File Audio Từ Máy</h3>
             <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
         <div class="form-group">
@@ -819,10 +819,25 @@
             }, 3000);
         }
 
-        const STORAGE_KEY = 'audio_book_stories_v2';
+        // Khởi tạo IndexedDB để lưu file Blob trực tiếp (Không lo giới hạn localStorage)
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('AudioBookDB_Files', 1);
+                request.onupgradeneeded = e => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains('audioBlobs')) {
+                        db.createObjectStore('audioBlobs');
+                    }
+                };
+                request.onsuccess = e => resolve(e.target.result);
+                request.onerror = e => reject(e.target.error);
+            });
+        }
+
+        const STORIES_KEY = 'audio_book_stories_v2';
         let currentStoryId = localStorage.getItem('currentStoryId');
         let currentStory = null;
-        let selectedAudioBase64 = '';
+        let selectedAudioFile = null;
         let isSelectingMode = false;
         let selectedEpisodesSet = new Set();
         
@@ -849,7 +864,7 @@
 
         function getStoriesFromStorage() {
             try {
-                const data = localStorage.getItem(STORAGE_KEY);
+                const data = localStorage.getItem(STORIES_KEY);
                 if (data) return JSON.parse(data);
             } catch (e) {
                 console.error(e);
@@ -859,11 +874,11 @@
 
         function saveStoriesToStorage(stories) {
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+                localStorage.setItem(STORIES_KEY, JSON.stringify(stories));
                 return true;
             } catch (e) {
                 console.error(e);
-                showToast('Bộ nhớ ngoại tuyến đã đầy! Không thể lưu thêm file.');
+                showToast('Lỗi lưu trữ dữ liệu truyện!');
                 return false;
             }
         }
@@ -893,7 +908,7 @@
             const container = document.getElementById('audioListContainer');
 
             if (episodes.length === 0) {
-                container.innerHTML = `<div class="empty-audio">Chưa có tập audio nào.<br>Bấm nút dấu cộng bên dưới để thêm tập nghe ngoại tuyến!</div>`;
+                container.innerHTML = `<div class="empty-audio">Chưa có tập audio nào.<br>Bấm nút dấu cộng bên dưới để thêm tập audio!</div>`;
                 return;
             }
 
@@ -904,7 +919,7 @@
                         <div class="episode-checkbox ${isChecked ? 'checked' : ''}" onclick="toggleSelectEpisode(${idx})"></div>
                         <div class="episode-info" onclick="handleEpisodeClick(${idx})">
                             <h4 class="episode-name">${escapeHtml(ep.name)}</h4>
-                            <p class="episode-date">💾 Ngoại tuyến • ${ep.date || 'Gần đây'}</p>
+                            <p class="episode-date">🎵 Tệp từ máy • ${ep.date || 'Gần đây'}</p>
                         </div>
                         <button class="play-btn" onclick="playEpisode(${idx})">
                             <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -933,24 +948,48 @@
             renderEpisodes();
         }
 
-        function playEpisode(index) {
+        // Phát file âm thanh trực tiếp thông qua Blob từ IndexedDB
+        async function playEpisode(index) {
             const ep = currentStory.episodes[index];
-            if (!ep || !ep.audioData) {
-                showToast('Không tìm thấy file audio ngoại tuyến!');
+            if (!ep || !ep.fileId) {
+                showToast('Không tìm thấy tệp audio liên kết!');
                 return;
             }
 
-            audioElement.src = ep.audioData;
-            audioElement.play().then(() => {
-                isPlaying = true;
-                document.getElementById('playIconSvg').style.display = 'none';
-                document.getElementById('pauseIconSvg').style.display = 'block';
-                document.getElementById('playerTrackTitle').textContent = ep.name;
-                document.getElementById('audioPlayerBar').classList.add('active');
-            }).catch(err => {
+            try {
+                const db = await openDB();
+                const tx = db.transaction('audioBlobs', 'readonly');
+                const store = tx.objectStore('audioBlobs');
+                const req = store.get(ep.fileId);
+
+                req.onsuccess = function(e) {
+                    const audioBlob = e.target.result;
+                    if (!audioBlob) {
+                        showToast('Tệp audio không tồn tại trên bộ nhớ máy!');
+                        return;
+                    }
+
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioElement.src = audioUrl;
+                    audioElement.play().then(() => {
+                        isPlaying = true;
+                        document.getElementById('playIconSvg').style.display = 'none';
+                        document.getElementById('pauseIconSvg').style.display = 'block';
+                        document.getElementById('playerTrackTitle').textContent = ep.name;
+                        document.getElementById('audioPlayerBar').classList.add('active');
+                    }).catch(err => {
+                        console.error(err);
+                        showToast('Không thể phát tệp âm thanh này.');
+                    });
+                };
+
+                req.onerror = function() {
+                    showToast('Lỗi đọc cơ sở dữ liệu tệp!');
+                };
+            } catch (err) {
                 console.error(err);
-                showToast('Không thể phát file audio này.');
-            });
+                showToast('Lỗi truy xuất file audio!');
+            }
         }
 
         function togglePlayPause() {
@@ -1013,7 +1052,7 @@
             document.getElementById('singleFileNameLabel').textContent = 'Chọn tệp MP3, M4A, WAV...';
             document.getElementById('uploadProgressText').style.display = 'none';
             document.getElementById('saveSingleEpisodeBtn').disabled = true;
-            selectedAudioBase64 = '';
+            selectedAudioFile = null;
         }
 
         function openEditStoryModal() {
@@ -1050,100 +1089,130 @@
             renderEpisodes();
         }
 
-        function executeDeleteSelectedEpisodes() {
+        async function executeDeleteSelectedEpisodes() {
             if (selectedEpisodesSet.size === 0) {
                 showToast('Chưa chọn tập nào để xóa!');
                 return;
             }
 
-            currentStory.episodes = currentStory.episodes.filter((_, idx) => !selectedEpisodesSet.has(idx));
-            let stories = getStoriesFromStorage();
-            const idx = stories.findIndex(s => s.id === currentStory.id);
-            if (idx !== -1) {
-                stories[idx] = currentStory;
-                if (saveStoriesToStorage(stories)) {
-                    showToast('Đã xóa các tập đã chọn!');
-                    cancelSelectionMode();
-                    loadStoryDetails();
+            try {
+                const db = await openDB();
+                const tx = db.transaction('audioBlobs', 'readwrite');
+                const store = tx.objectStore('audioBlobs');
+
+                selectedEpisodesSet.forEach(idx => {
+                    const ep = currentStory.episodes[idx];
+                    if (ep && ep.fileId) {
+                        store.delete(ep.fileId);
+                    }
+                });
+
+                currentStory.episodes = currentStory.episodes.filter((_, idx) => !selectedEpisodesSet.has(idx));
+                let stories = getStoriesFromStorage();
+                const storyIdx = stories.findIndex(s => s.id === currentStory.id);
+                if (storyIdx !== -1) {
+                    stories[storyIdx] = currentStory;
+                    if (saveStoriesToStorage(stories)) {
+                        showToast('Đã xóa các tập đã chọn!');
+                        cancelSelectionMode();
+                        loadStoryDetails();
+                    }
                 }
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi khi xóa tệp audio!');
             }
         }
 
         // Xóa toàn bộ truyện
-        function executeDeleteStory() {
-            let stories = getStoriesFromStorage();
-            stories = stories.filter(s => s.id !== currentStoryId);
-            if (saveStoriesToStorage(stories)) {
-                showToast('Đã xóa bộ truyện thành công!');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 800);
+        async function executeDeleteStory() {
+            try {
+                const db = await openDB();
+                const tx = db.transaction('audioBlobs', 'readwrite');
+                const store = tx.objectStore('audioBlobs');
+
+                if (currentStory.episodes) {
+                    currentStory.episodes.forEach(ep => {
+                        if (ep.fileId) store.delete(ep.fileId);
+                    });
+                }
+
+                let stories = getStoriesFromStorage();
+                stories = stories.filter(s => s.id !== currentStoryId);
+                if (saveStoriesToStorage(stories)) {
+                    showToast('Đã xóa bộ truyện thành công!');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 800);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi khi xóa bộ truyện!');
             }
         }
 
-        // Xử lý file Audio cho iOS & Android
+        // Xử lý file Audio kết nối trực tiếp từ máy qua IndexedDB
         async function handleAudioFileSelected(input) {
             if (input.files && input.files[0]) {
-                const file = input.files[0];
-                document.getElementById('singleFileNameLabel').textContent = file.name;
+                selectedAudioFile = input.files[0];
+                document.getElementById('singleFileNameLabel').textContent = selectedAudioFile.name;
                 if (!document.getElementById('singleEpisodeName').value.trim()) {
-                    document.getElementById('singleEpisodeName').value = file.name.replace(/\.[^/.]+$/, "");
+                    document.getElementById('singleEpisodeName').value = selectedAudioFile.name.replace(/\.[^/.]+$/, "");
                 }
                 document.getElementById('uploadProgressText').style.display = 'block';
-                document.getElementById('uploadProgressText').textContent = '⏳ Đang mã hóa file lưu ngoại tuyến...';
-                document.getElementById('saveSingleEpisodeBtn').disabled = true;
-
-                try {
-                    selectedAudioBase64 = await fileToBase64(file);
-                    document.getElementById('uploadProgressText').textContent = '✓ Sẵn sàng lưu ngoại tuyến!';
-                    document.getElementById('saveSingleEpisodeBtn').disabled = false;
-                } catch (err) {
-                    console.error(err);
-                    showToast('Lỗi đọc file audio!');
-                    document.getElementById('uploadProgressText').textContent = 'Lỗi đọc file!';
-                }
+                document.getElementById('uploadProgressText').textContent = '✓ Đã sẵn sàng kết nối tệp từ máy!';
+                document.getElementById('saveSingleEpisodeBtn').disabled = false;
             }
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function saveSingleAudioEpisode() {
+        async function saveSingleAudioEpisode() {
             const name = document.getElementById('singleEpisodeName').value.trim();
             if (!name) {
                 showToast('Vui lòng nhập tên tập audio!');
                 return;
             }
-            if (!selectedAudioBase64) {
-                showToast('Vui lòng chọn file audio hợp lệ!');
+            if (!selectedAudioFile) {
+                showToast('Vui lòng chọn file audio từ máy!');
                 return;
             }
 
-            const newEpisode = {
-                id: 'ep_' + Date.now(),
-                name: name,
-                date: new Date().toLocaleDateString('vi-VN'),
-                audioData: selectedAudioBase64
-            };
+            const fileId = 'file_' + Date.now();
 
-            if (!currentStory.episodes) currentStory.episodes = [];
-            currentStory.episodes.push(newEpisode);
+            try {
+                const db = await openDB();
+                const tx = db.transaction('audioBlobs', 'readwrite');
+                const store = tx.objectStore('audioBlobs');
+                store.put(selectedAudioFile, fileId);
 
-            let stories = getStoriesFromStorage();
-            const idx = stories.findIndex(s => s.id === currentStory.id);
-            if (idx !== -1) {
-                stories[idx] = currentStory;
-                if (saveStoriesToStorage(stories)) {
-                    closeAllModals();
-                    loadStoryDetails();
-                    showToast('Đã lưu tập audio ngoại tuyến thành công!');
-                }
+                tx.oncomplete = function() {
+                    const newEpisode = {
+                        id: 'ep_' + Date.now(),
+                        name: name,
+                        date: new Date().toLocaleDateString('vi-VN'),
+                        fileId: fileId
+                    };
+
+                    if (!currentStory.episodes) currentStory.episodes = [];
+                    currentStory.episodes.push(newEpisode);
+
+                    let stories = getStoriesFromStorage();
+                    const idx = stories.findIndex(s => s.id === currentStory.id);
+                    if (idx !== -1) {
+                        stories[idx] = currentStory;
+                        if (saveStoriesToStorage(stories)) {
+                            closeAllModals();
+                            loadStoryDetails();
+                            showToast('Đã liên kết và lưu tệp audio từ máy thành công!');
+                        }
+                    }
+                };
+
+                tx.onerror = function() {
+                    showToast('Lỗi lưu trữ tệp vào bộ nhớ thiết bị!');
+                };
+            } catch (err) {
+                console.error(err);
+                showToast('Bộ nhớ thiết bị đã đầy hoặc lỗi kết nối file!');
             }
         }
 
@@ -1181,6 +1250,15 @@
                     showToast('Đã cập nhật thông tin truyện thành công!');
                 }
             }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
         }
 
         function escapeHtml(text) {
