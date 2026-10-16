@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <title>Chi Tiết Tiểu Thuyết - Thư Viện Sách Nói</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Dark Theme */
+            --bg-gradient-dark: linear-gradient(135deg, #020617 0%, #090d1a 50%, #0f172a 100%);
+            --bg-fallback-dark: #020617;
+            --card-bg-dark: rgba(15, 23, 42, 0.85);
+            --card-border-dark: rgba(255, 255, 255, 0.08);
+            --card-hover-dark: rgba(30, 41, 59, 0.95);
+            --text-primary-dark: #f8fafc;
+            --text-secondary-dark: #94a3b8;
+            --accent-color-dark: #f43f5e;
+            --accent-light-dark: rgba(244, 63, 94, 0.2);
+            
+            /* Light Theme */
+            --bg-gradient-light: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #faf5ff 100%);
+            --bg-fallback-light: #f0f9ff;
+            --card-bg-light: rgba(255, 255, 255, 0.85);
+            --card-border-light: rgba(226, 232, 240, 0.9);
+            --card-hover-light: rgba(255, 255, 255, 1);
+            --text-primary-light: #0f172a;
+            --text-secondary-light: #64748b;
+            --accent-color-light: #e11d48;
+            --accent-light-light: rgba(225, 29, 72, 0.12);
+        }
+
+        body {
+            --bg-gradient: var(--bg-gradient-dark);
+            --bg-fallback: var(--bg-fallback-dark);
+            --card-bg: var(--card-bg-dark);
+            --card-border: var(--card-border-dark);
+            --card-hover: var(--card-hover-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --accent: var(--accent-color-dark);
+            --accent-bg: var(--accent-light-dark);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+        }
+
+        body.light-theme {
+            --bg-gradient: var(--bg-gradient-light);
+            --bg-fallback: var(--bg-fallback-light);
+            --card-bg: var(--card-bg-light);
+            --card-border: var(--card-border-light);
+            --card-hover: var(--card-hover-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            --accent: var(--accent-color-light);
+            --accent-bg: var(--accent-light-light);
+            --shadow-color: rgba(148, 163, 184, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, transform 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-color: var(--bg-fallback);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(90px, env(safe-area-inset-bottom));
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sky-decorations {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: -1; overflow: hidden;
+        }
+
+        .moon {
+            position: absolute; top: 40px; right: 8%; width: 60px; height: 60px;
+            border-radius: 50%; box-shadow: -10px 8px 0 2px #fef08a, 0 0 20px rgba(254, 240, 138, 0.25);
+            opacity: 0.9; transition: opacity 0.5s ease;
+        }
+
+        .stars {
+            position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 80px 120px, #fef08a, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 200px 70px, #ffffff, rgba(0,0,0,0));
+            background-size: 500px 500px; opacity: 0.7;
+            animation: twinkle 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 0.9; } }
+
+        .sun-glow {
+            position: absolute; top: -50px; right: -30px; width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(253, 224, 71, 0.4) 0%, rgba(253, 186, 116, 0.15) 50%, rgba(255,255,255,0) 70%);
+            border-radius: 50%; opacity: 0; transition: opacity 0.5s ease;
+        }
+
+        .clouds {
+            position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(50px 25px at 60px 80px, rgba(255, 255, 255, 0.8), rgba(255,255,255,0)),
+                radial-gradient(70px 35px at 280px 140px, rgba(255, 255, 255, 0.7), rgba(255,255,255,0));
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+
+        body.light-theme .moon, body.light-theme .stars { opacity: 0; }
+        body.light-theme .sun-glow, body.light-theme .clouds { opacity: 1; }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .icon-btn:active { transform: scale(0.92); }
+        .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-btn.danger { color: #f43f5e; border-color: rgba(244, 63, 94, 0.3); }
+
+        .story-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 14px;
+            display: flex;
+            gap: 14px;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            margin-bottom: 14px;
+            align-items: center;
+        }
+
+        .story-cover {
+            width: 82px;
+            height: 114px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .story-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .story-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0 0 4px 0;
+            color: var(--text-primary);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .story-author {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 0 0 8px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .story-meta-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .badge-secondary {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .summary-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 14px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.5;
+            box-shadow: 0 4px 16px var(--shadow-color);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 0 2px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .audio-container-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 12px;
+            max-height: 440px;
+            overflow-y: auto;
+            box-shadow: 0 6px 20px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 80px;
+        }
+
+        .audio-container-box::-webkit-scrollbar { width: 4px; }
+        .audio-container-box::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 10px; }
+
+        .list-group-card {
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        body.light-theme .list-group-card {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .list-group-header {
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .list-group-header:active { background: var(--card-hover); }
+
+        .list-group-body {
+            padding: 8px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .list-group-body.collapsed { display: none; }
+
+        .episode-item {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 10px 12px;
+            gap: 10px;
+        }
+
+        .episode-item:hover { background: var(--card-hover); }
+
+        .episode-checkbox {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--text-secondary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .episode-checkbox.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .episode-checkbox.checked::after { content: '✓'; font-size: 12px; font-weight: 800; }
+        .selecting-mode .episode-checkbox { display: flex; }
+
+        .episode-info {
+            flex: 1;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .episode-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0 0 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-primary);
+        }
+
+        .episode-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .play-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            box-shadow: 0 3px 10px var(--accent-bg);
+        }
+
+        .play-btn:active { transform: scale(0.92); }
+        .play-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* Streaming Audio Player Bar fixed at bottom */
+        .audio-player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 900;
+            box-shadow: 0 -10px 30px var(--shadow-color);
+        }
+        .audio-player-bar.active { display: flex; }
+
+        .player-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .player-track-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 280px;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .player-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--accent-bg);
+        }
+        .player-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--card-border);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .fab-btn {
+            position: fixed;
+            bottom: max(20px, env(safe-area-inset-bottom));
+            left: 16px;
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
+            z-index: 100;
+        }
+        .fab-btn:active { transform: scale(0.92); }
+        .fab-btn svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+        .batch-bar {
+            display: none;
+            position: fixed;
+            bottom: max(20px, env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 440px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--accent);
+            border-radius: 18px;
+            padding: 12px 16px;
+            z-index: 101;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+        .batch-bar.active { display: flex; }
+
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .bottom-sheet {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: var(--bg-gradient);
+            border-radius: 24px 24px 0 0;
+            padding: 20px 16px max(30px, env(safe-area-inset-bottom));
+            box-sizing: border-box; z-index: 1001;
+            transition: bottom 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 85vh; overflow-y: auto;
+            border-top: 1px solid var(--card-border);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            max-width: 480px; left: 50%; transform: translateX(-50%);
+        }
+        .bottom-sheet.active { bottom: 0; }
+
+        .sheet-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .sheet-title { font-size: 16px; font-weight: 800; margin: 0; color: var(--text-primary); }
+        .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; padding: 0; }
+
+        .sheet-option-btn {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: var(--font-main);
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 10px var(--shadow-color);
+        }
+        .sheet-option-btn:hover { background: var(--card-hover); border-color: var(--accent); }
+        .sheet-option-btn svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2.2; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; }
+        .form-input, .form-select {
+            width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
+            color: var(--text-primary); padding: 12px; border-radius: 12px; font-size: 13px;
+            font-family: var(--font-main); outline: none;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .file-upload-btn {
+            background: rgba(244, 63, 94, 0.1);
+            border: 2px dashed var(--accent);
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .file-upload-btn svg { width: 18px; height: 18px; stroke: var(--accent); }
+        .file-input-hidden { display: none; }
+
+        .upload-progress {
+            display: none;
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .submit-btn {
+            width: 100%; background: var(--accent); color: #ffffff; border: none;
+            padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700;
+            font-family: var(--font-main); cursor: pointer; margin-top: 8px;
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+        }
+        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #toast-container {
+            position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+            z-index: 2000; display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none; width: 90%; max-width: 360px; align-items: center;
+        }
+        .custom-toast {
+            background: var(--card-bg); backdrop-filter: blur(16px);
+            color: var(--text-primary); padding: 10px 18px; border-radius: 30px;
+            font-size: 12px; font-weight: 600; box-shadow: 0 6px 20px var(--shadow-color);
+            opacity: 0; transform: translateY(15px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 1px solid var(--card-border); text-align: center;
+        }
+        .custom-toast.show { opacity: 1; transform: translateY(0); }
+
+        .empty-audio {
+            text-align: center; padding: 30px 10px; color: var(--text-secondary); font-size: 13px; font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sky-decorations">
+        <div class="moon"></div>
+        <div class="stars"></div>
+        <div class="sun-glow"></div>
+        <div class="clouds"></div>
+    </div>
+
+    <div class="app-header">
+        <div class="header-left">
+            <a href="index.html" class="icon-btn" title="Quay lại Thư Viện">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </a>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Ngày / Đêm">
+                <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg id="themeIconSun" viewBox="0 0 24 24" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+            <button class="icon-btn danger" onclick="confirmDeleteStory()" title="Xóa bộ truyện">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Thông tin tổng quan bộ truyện -->
+    <div class="story-card" id="storyCardContainer">
+        <img src="" alt="Bìa" class="story-cover" id="storyCoverImg">
+        <div class="story-details">
+            <h2 class="story-title" id="storyTitleText">Đang tải...</h2>
+            <p class="story-author" id="storyAuthorText">---</p>
+            <div class="story-meta-row">
+                <span class="badge" id="storyEpisodeCountBadge">0 tập audio</span>
+                <span class="badge badge-secondary" id="offlineStatusBadge">💾 Sẵn sàng Offline</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tóm tắt -->
+    <div class="summary-box" id="storySummaryText">
+        Đang tải nội dung tóm tắt...
+    </div>
+
+    <div class="section-header">
+        <span class="section-title">Danh Sách Tập Audio</span>
+    </div>
+
+    <!-- Danh sách tập audio -->
+    <div class="audio-container-box" id="audioListContainer">
+        <div class="empty-audio">Đang tải danh sách tập...</div>
+    </div>
+
+    <!-- Nút thêm tập audio nổi -->
+    <button class="fab-btn" onclick="openActionModal()" title="Thêm tập audio">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+
+    <!-- Thanh phát nhạc Audio Streaming / Offline -->
+    <div class="audio-player-bar" id="audioPlayerBar">
+        <div class="player-info-row">
+            <span class="player-track-name" id="playerTrackTitle">Chưa phát tập nào</span>
+            <button class="icon-btn" style="width: 32px; height: 32px;" onclick="closeAudioPlayer()">&times;</button>
+        </div>
+        <div class="progress-bar-container" id="progressBarContainer" onclick="seekAudio(event)">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div class="player-controls">
+            <button class="player-btn" onclick="togglePlayPause()" id="playerPlayPauseBtn">
+                <svg id="playIconSvg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <svg id="pauseIconSvg" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Chọn Thao Tác Thêm Tập Audio -->
+    <div class="modal-overlay" id="actionModalOverlay" onclick="closeActionModal()"></div>
+    <div class="bottom-sheet" id="actionModalSheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Thêm Tập Audio Mới</h3>
+            <button class="close-btn" onclick="closeActionModal()">&times;</button>
+        </div>
+        <button class="sheet-option-btn" onclick="openSingleUploadModal()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Tải lên file Audio (MP3, WAV, M4A) lưu ngoại tuyến
+        </button>
+        <button class="sheet-option-btn" onclick="openBatchUploadModal()">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+            Tải lên nhiều tập / Thêm theo chương
+        </button>
+    </div>
+
+    <!-- Modal Tải Lên Đơn Lẻ (Hỗ trợ ngoại tuyến Offline 100%) -->
+    <div class="bottom-sheet" id="singleUploadSheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Thêm File Audio (Nghe Không Cần Mạng)</h3>
+            <button class="close-btn" onclick="closeSingleUploadModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tên tập / Chương truyện</label>
+            <input type="text" class="form-input" id="singleEpisodeName" placeholder="VD: Chương 01: Khởi Đầu">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Chọn Chương / Nhóm hiển thị</label>
+            <select class="form-select" id="singleEpisodeGroup">
+                <option value="Phần 1: Khởi Đầu">Phần 1: Khởi Đầu</option>
+                <option value="Phần 2: Cao Trào">Phần 2: Cao Trào</option>
+                <option value="Phần 3: Kết Thúc">Phần 3: Kết Thúc</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tệp Audio (Lưu trực tiếp vào trình duyệt để nghe offline)</label>
+            <div class="file-upload-wrapper">
+                <label class="file-upload-btn" for="singleAudioFileInput">
+                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    <span id="singleFileNameLabel">Chạm để chọn file Audio</span>
+                </label>
+                <input type="file" id="singleAudioFileInput" class="file-input-hidden" accept="audio/*" onchange="handleAudioFileSelected(this)">
+            </div>
+            <div class="upload-progress" id="uploadProgressText">Đang xử lý lưu trữ ngoại tuyến...</div>
+        </div>
+        <button class="submit-btn" id="saveSingleEpisodeBtn" onclick="saveSingleAudioEpisode()" disabled>Lưu Tập Audio</button>
+    </div>
+
+    <!-- Toast Thông Báo -->
+    <div id="toast-container"></div>
+
+    <script>
+        function initTheme() {
+            const savedTheme = localStorage.getItem('appTheme') || 'dark';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.getElementById('themeIconMoon').style.display = 'none';
+                document.getElementById('themeIconSun').style.display = 'block';
+            } else {
+                document.body.classList.remove('light-theme');
+                document.getElementById('themeIconMoon').style.display = 'block';
+                document.getElementById('themeIconSun').style.display = 'none';
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle('light-theme');
+            localStorage.setItem('appTheme', isLight ? 'light' : 'dark');
+            document.getElementById('themeIconMoon').style.display = isLight ? 'none' : 'block';
+            document.getElementById('themeIconSun').style.display = isLight ? 'block' : 'none';
+            showToast(isLight ? 'Đã chuyển sang Chế độ Ban Ngày ☀️' : 'Đã chuyển sang Chế độ Ban Đêm 🌙');
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        const STORAGE_KEY = 'audio_book_stories_v2';
+        let currentStoryId = localStorage.getItem('currentStoryId');
+        let currentStory = null;
+        let selectedAudioBase64 = '';
+        
+        let audioElement = new Audio();
+        let isPlaying = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadStoryDetails();
+
+            audioElement.addEventListener('timeupdate', () => {
+                if (audioElement.duration) {
+                    const pct = (audioElement.currentTime / audioElement.duration) * 100;
+                    document.getElementById('progressBarFill').style.width = pct + '%';
+                }
+            });
+
+            audioElement.addEventListener('ended', () => {
+                isPlaying = false;
+                document.getElementById('playIconSvg').style.display = 'block';
+                document.getElementById('pauseIconSvg').style.display = 'none';
+            });
+        });
+
+        function getStoriesFromStorage() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) return JSON.parse(data);
+            } catch (e) {
+                console.error(e);
+            }
+            return [];
+        }
+
+        function saveStoriesToStorage(stories) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+                return true;
+            } catch (e) {
+                console.error(e);
+                showToast('Bộ nhớ ngoại tuyến đã đầy! Không thể lưu thêm file lớn.');
+                return false;
+            }
+        }
+
+        function loadStoryDetails() {
+            const stories = getStoriesFromStorage();
+            currentStory = stories.find(s => s.id === currentStoryId);
+
+            if (!currentStory) {
+                document.getElementById('storyTitleText').textContent = 'Không tìm thấy bộ truyện!';
+                document.getElementById('storySummaryText').textContent = 'Vui lòng quay lại thư viện và chọn lại bộ tiểu thuyết.';
+                document.getElementById('audioListContainer').innerHTML = `<div class="empty-audio">Không có dữ liệu tiểu thuyết.</div>`;
+                return;
+            }
+
+            document.getElementById('storyTitleText').textContent = currentStory.name || 'Tiểu thuyết';
+            document.getElementById('storyAuthorText').textContent = currentStory.author || 'Đang cập nhật';
+            document.getElementById('storySummaryText').textContent = currentStory.summary || 'Chưa có tóm tắt.';
+            document.getElementById('storyCoverImg').src = currentStory.cover || 'https://placehold.co/150x220/1e293b/cbd5e1?text=No+Cover';
+
+            renderEpisodes();
+        }
+
+        function renderEpisodes() {
+            const episodes = currentStory.episodes || [];
+            document.getElementById('storyEpisodeCountBadge').textContent = `${episodes.length} tập audio`;
+            const container = document.getElementById('audioListContainer');
+
+            if (episodes.length === 0) {
+                container.innerHTML = `<div class="empty-audio">Chưa có tập audio nào.<br>Bấm nút dấu cộng bên dưới để thêm tập nghe ngoại tuyến!</div>`;
+                return;
+            }
+
+            // Nhóm theo phần/chương
+            const groups = {};
+            episodes.forEach((ep, idx) => {
+                const groupName = ep.group || 'Phần 1: Khởi Đầu';
+                if (!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push({ ...ep, originalIndex: idx });
+            });
+
+            let html = '';
+            for (const [groupName, eps] of Object.entries(groups)) {
+                html += `
+                    <div class="list-group-card">
+                        <div class="list-group-header" onclick="toggleGroup(this)">
+                            <span>📁 ${escapeHtml(groupName)} (${eps.length})</span>
+                            <span>▼</span>
+                        </div>
+                        <div class="list-group-body">
+                            ${eps.map(ep => `
+                                <div class="episode-item">
+                                    <div class="episode-info" onclick="playEpisode('${ep.originalIndex}')">
+                                        <h4 class="episode-name">${escapeHtml(ep.name)}</h4>
+                                        <p class="episode-date">💾 Đã lưu ngoại tuyến • ${ep.date || 'Gần đây'}</p>
+                                    </div>
+                                    <button class="play-btn" onclick="playEpisode('${ep.originalIndex}')">
+                                        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        Nghe
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleGroup(headerEl) {
+            const bodyEl = headerEl.nextElementSibling;
+            bodyEl.classList.toggle('collapsed');
+        }
+
+        function playEpisode(index) {
+            const ep = currentStory.episodes[index];
+            if (!ep || !ep.audioData) {
+                showToast('Không tìm thấy file audio ngoại tuyến!');
+                return;
+            }
+
+            audioElement.src = ep.audioData;
+            audioElement.play().then(() => {
+                isPlaying = true;
+                document.getElementById('playIconSvg').style.display = 'none';
+                document.getElementById('pauseIconSvg').style.display = 'block';
+                document.getElementById('playerTrackTitle').textContent = ep.name;
+                document.getElementById('audioPlayerBar').classList.add('active');
+            }).catch(err => {
+                console.error(err);
+                showToast('Không thể phát file audio này.');
+            });
+        }
+
+        function togglePlayPause() {
+            if (audioElement.paused) {
+                audioElement.play();
+                isPlaying = true;
+                document.getElementById('playIconSvg').style.display = 'none';
+                document.getElementById('pauseIconSvg').style.display = 'block';
+            } else {
+                audioElement.pause();
+                isPlaying = false;
+                document.getElementById('playIconSvg').style.display = 'block';
+                document.getElementById('pauseIconSvg').style.display = 'none';
+            }
+        }
+
+        function seekAudio(event) {
+            const container = document.getElementById('progressBarContainer');
+            const rect = container.getBoundingClientRect();
+            const pos = (event.clientX - rect.left) / rect.width;
+            if (audioElement.duration) {
+                audioElement.currentTime = pos * audioElement.duration;
+            }
+        }
+
+        function closeAudioPlayer() {
+            audioElement.pause();
+            audioPlayerBar.classList.remove('active');
+            isPlaying = false;
+        }
+
+        function openActionModal() {
+            document.getElementById('actionModalOverlay').classList.add('active');
+            document.getElementById('actionModalSheet').classList.add('active');
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModalOverlay').classList.remove('active');
+            document.getElementById('actionModalSheet').classList.remove('active');
+        }
+
+        function openSingleUploadModal() {
+            closeActionModal();
+            document.getElementById('actionModalOverlay').classList.add('active');
+            document.getElementById('singleUploadSheet').classList.add('active');
+        }
+
+        function closeSingleUploadModal() {
+            document.getElementById('actionModalOverlay').classList.remove('active');
+            document.getElementById('singleUploadSheet').classList.remove('active');
+            document.getElementById('singleEpisodeName').value = '';
+            document.getElementById('singleAudioFileInput').value = '';
+            document.getElementById('singleFileNameLabel').textContent = 'Chạm để chọn file Audio';
+            document.getElementById('saveSingleEpisodeBtn').disabled = true;
+            selectedAudioBase64 = '';
+        }
+
+        function openBatchUploadModal() {
+            closeActionModal();
+            openSingleUploadModal(); // Sử dụng chung giao diện tải lên thông minh
+        }
+
+        async function handleAudioFileSelected(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('singleFileNameLabel').textContent = file.name;
+                if (!document.getElementById('singleEpisodeName').value) {
+                    document.getElementById('singleEpisodeName').value = file.name.replace(/\.[^/.]+$/, "");
+                }
+                document.getElementById('uploadProgressText').style.display = 'block';
+                document.getElementById('saveSingleEpisodeBtn').disabled = true;
+
+                try {
+                    selectedAudioBase64 = await fileToBase64(file);
+                    document.getElementById('uploadProgressText').textContent = '✓ Sẵn sàng lưu ngoại tuyến!';
+                    document.getElementById('saveSingleEpisodeBtn').disabled = false;
+                } catch (err) {
+                    console.error(err);
+                    showToast('Lỗi đọc file audio!');
+                    document.getElementById('uploadProgressText').textContent = 'Lỗi đọc file!';
+                }
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function saveSingleAudioEpisode() {
+            const name = document.getElementById('singleEpisodeName').value.trim();
+            const group = document.getElementById('singleEpisodeGroup').value;
+
+            if (!name) {
+                showToast('Vui lòng nhập tên tập audio!');
+                return;
+            }
+            if (!selectedAudioBase64) {
+                showToast('Vui lòng chọn file audio hợp lệ!');
+                return;
+            }
+
+            const newEpisode = {
+                id: 'ep_' + Date.now(),
+                name: name,
+                group: group,
+                date: new Date().toLocaleDateString('vi-VN'),
+                audioData: selectedAudioBase64
+            };
+
+            if (!currentStory.episodes) currentStory.episodes = [];
+            currentStory.episodes.push(newEpisode);
+
+            let stories = getStoriesFromStorage();
+            const idx = stories.findIndex(s => s.id === currentStory.id);
+            if (idx !== -1) {
+                stories[idx] = currentStory;
+                if (saveStoriesToStorage(stories)) {
+                    closeSingleUploadModal();
+                    loadStoryDetails();
+                    showToast('Đã lưu tập audio ngoại tuyến thành công!');
+                }
+            }
+        }
+
+        function confirmDeleteStory() {
+            if (confirm('Bạn có chắc chắn muốn xóa bộ tiểu thuyết này cùng toàn bộ audio ngoại tuyến không?')) {
+                let stories = getStoriesFromStorage();
+                stories = stories.filter(s => s.id !== currentStoryId);
+                if (saveStoriesToStorage(stories)) {
+                    showToast('Đã xóa bộ truyện thành công!');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 800);
+                }
+            }
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
