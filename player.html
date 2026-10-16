@@ -62,6 +62,8 @@
             --accent: var(--accent-color-dark);
             --accent-bg: var(--accent-light-dark);
             --shadow-color: rgba(0, 0, 0, 0.5);
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body.light-theme {
@@ -116,11 +118,11 @@
         body.customizing-layout .layout-grid-overlay { display: block; }
         body.customizing-layout .player-module {
             outline: 2px dashed var(--accent);
-            cursor: move;
+            cursor: pointer;
             position: relative;
         }
         body.customizing-layout .player-module::after {
-            content: '⋮⋮ Kéo/Sắp xếp';
+            content: '⋮⋮ Chạm để đổi vị trí';
             position: absolute;
             top: 4px; right: 8px;
             font-size: 10px;
@@ -129,6 +131,7 @@
             padding: 2px 6px;
             border-radius: 6px;
             font-weight: 700;
+            pointer-events: none;
         }
 
         .sky-decorations {
@@ -218,7 +221,7 @@
             box-shadow: 0 4px 12px var(--shadow-color);
         }
 
-        /* Thông báo lịch sử nghe trước đó (Bấm vào để nhảy tới) */
+        /* Thông báo lịch sử nghe trước đó */
         .history-banner {
             display: none;
             align-items: center;
@@ -232,7 +235,6 @@
             font-weight: 700;
             box-shadow: 0 6px 20px var(--shadow-color);
             cursor: pointer;
-            animation: bounce-in 0.3s ease;
         }
         .history-banner:hover { background: var(--card-hover); }
 
@@ -244,7 +246,7 @@
             flex: 1;
         }
 
-        /* Module 1: Ảnh bìa & Tên (Cover & Title) */
+        /* Module 1: Ảnh bìa & Tên */
         .player-top-section {
             display: flex;
             flex-direction: column;
@@ -261,6 +263,7 @@
             border: 1px solid var(--card-border);
             margin-bottom: 12px;
             background: rgba(0,0,0,0.2);
+            pointer-events: none;
         }
 
         .player-cover {
@@ -295,12 +298,12 @@
             margin-top: auto;
         }
 
-        /* Thanh tiến trình kéo trượt mượt mà */
+        /* Thanh tiến trình kéo trượt mượt mà (Touch / Pointer Optimized) */
         .progress-container {
             width: 100%;
-            height: 12px;
+            height: 16px;
             background: var(--card-border);
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             position: relative;
             margin-bottom: 8px;
@@ -313,7 +316,7 @@
             height: 100%;
             background: var(--accent);
             width: 0%;
-            border-radius: 6px;
+            border-radius: 8px;
             position: relative;
             pointer-events: none;
         }
@@ -407,7 +410,7 @@
         .feature-item-btn:hover { background: var(--card-hover); border-color: var(--accent); }
         .feature-item-btn svg { width: 16px; height: 16px; stroke: var(--accent); fill: none; stroke-width: 2; }
 
-        /* Modal / Bottom Sheets */
+        /* Modals */
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(0, 0, 0, 0.65);
@@ -527,7 +530,7 @@
     <!-- Khung chính linh hoạt theo thứ tự sắp xếp của người dùng -->
     <div class="player-container-flex" id="playerContainerFlex">
         
-        <!-- Module 1: Ảnh bìa & Tên (Cover & Title) -->
+        <!-- Module 1: Ảnh bìa & Tên -->
         <div class="player-top-section player-module" id="moduleCoverTitle" data-order="1">
             <div class="player-cover-container">
                 <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
@@ -536,7 +539,7 @@
             <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
         </div>
 
-        <!-- Module 2: Tiến trình & Điều khiển -->
+        <!-- Module 2: Điều khiển & Tiến trình -->
         <div class="player-bottom-section player-module" id="moduleControls" data-order="2">
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar" id="progressBar">
@@ -716,7 +719,7 @@
 
             loadStoryAndPlay();
 
-            // Lắng nghe sự kiện phát & tiến trình không bị kẹt
+            // Lắng nghe sự kiện timeupdate liên tục cập nhật tiến trình chuẩn xác
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isDraggingProgress) {
                     const pct = (audioElement.currentTime / audioElement.duration) * 100;
@@ -745,14 +748,13 @@
             setupProgressScrubbing();
         });
 
-        // Kéo trượt thanh tiến trình bằng tay (Touch & Mouse support)
+        // Thanh tiến trình kéo trượt mượt mà (Touch & Pointer support hoàn thiện)
         let isDraggingProgress = false;
         function setupProgressScrubbing() {
             const container = document.getElementById('progressContainer');
 
-            const updateScrub = (e) => {
+            const updateScrub = (clientX) => {
                 const rect = container.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 let pos = (clientX - rect.left) / rect.width;
                 pos = Math.min(Math.max(pos, 0), 1);
                 
@@ -764,14 +766,15 @@
             };
 
             container.addEventListener('pointerdown', (e) => {
+                if (isCustomizing) return;
                 isDraggingProgress = true;
                 container.setPointerCapture(e.pointerId);
-                updateScrub(e);
+                updateScrub(e.clientX);
             });
 
             container.addEventListener('pointermove', (e) => {
                 if (isDraggingProgress) {
-                    updateScrub(e);
+                    updateScrub(e.clientX);
                 }
             });
 
@@ -779,8 +782,7 @@
                 if (isDraggingProgress) {
                     isDraggingProgress = false;
                     const rect = container.getBoundingClientRect();
-                    const clientX = e.clientX;
-                    let pos = (clientX - rect.left) / rect.width;
+                    let pos = (e.clientX - rect.left) / rect.width;
                     pos = Math.min(Math.max(pos, 0), 1);
                     if (audioElement.duration) {
                         audioElement.currentTime = pos * audioElement.duration;
@@ -1011,7 +1013,7 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh bố cục giao diện với lưới căn chỉnh (Layout Customizer)
+        // Tùy chỉnh bố cục giao diện (Layout Customizer)
         let isCustomizing = false;
         function toggleLayoutCustomizer() {
             isCustomizing = !isCustomizing;
@@ -1023,12 +1025,10 @@
                 btn.classList.add('active-custom');
                 showToast('Đang bật chế độ chỉnh sửa giao diện. Chạm vào các module để hoán đổi vị trí!');
                 
-                // Cho phép bấm vào module để đổi vị trí lên/xuống
                 const modules = container.querySelectorAll('.player-module');
                 modules.forEach(mod => {
                     mod.onclick = () => {
                         if (!isCustomizing) return;
-                        // Đổi chỗ các module với nhau
                         container.appendChild(mod);
                         saveLayoutOrder();
                         showToast('Đã sắp xếp lại bố cục!');
