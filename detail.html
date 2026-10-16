@@ -839,7 +839,7 @@
             renderEpisodes();
         }
 
-        // Bấm nút Nghe sẽ chuyển trực tiếp sang trang player.html
+        // Chuyển hướng sang trang player.html để phát audio
         function playEpisode(index) {
             localStorage.setItem('currentEpisodeIndex', index);
             window.location.href = 'player.html';
@@ -975,7 +975,6 @@
             }
         }
 
-        // Xử lý file Audio kết nối trực tiếp từ máy qua IndexedDB
         async function handleAudioFileSelected(input) {
             if (input.files && input.files[0]) {
                 selectedAudioFile = input.files[0];
@@ -1040,7 +1039,6 @@
             }
         }
 
-        // Lưu thay đổi thông tin truyện
         async function saveStoryInfoChanges() {
             const name = document.getElementById('editStoryNameInput').value.trim();
             const author = document.getElementById('editStoryAuthorInput').value.trim();
