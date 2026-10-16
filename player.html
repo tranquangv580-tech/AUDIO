@@ -103,7 +103,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Chế độ chỉnh sửa giao diện hiển thị các nút điều hướng Lên / Xuống */
+        /* Chế độ chỉnh sửa giao diện hiển thị các nút nhích Lên / Xuống */
         .layout-grid-overlay {
             position: fixed; inset: 0; pointer-events: none; z-index: 999; display: none;
             background-image: linear-gradient(to right, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
@@ -192,7 +192,7 @@
 
         .player-container-flex { display: flex; flex-direction: column; gap: 16px; flex: 1; }
 
-        .player-top-section { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+        .player-top-section { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; transition: transform 0.2s ease; }
         .player-cover-container {
             width: 150px; height: 210px; border-radius: 18px; overflow: hidden;
             box-shadow: 0 10px 25px var(--shadow-color); border: 1px solid var(--card-border);
@@ -205,15 +205,15 @@
         .player-bottom-section {
             background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border); border-radius: 28px; padding: 18px;
-            box-shadow: 0 8px 32px var(--shadow-color); margin-top: auto; position: relative;
+            box-shadow: 0 8px 32px var(--shadow-color); margin-top: auto; position: relative; transition: transform 0.2s ease;
         }
 
-        /* Thanh tiến trình chuẩn HTML Range Slider siêu mượt */
+        /* Thanh tiến trình với dải màu thể hiện đoạn đã qua tới chỗ nút tròn */
         .progress-slider {
             width: 100%;
             -webkit-appearance: none;
             appearance: none;
-            background: var(--card-border);
+            background: linear-gradient(to right, var(--accent) 0%, var(--card-border) 0%);
             height: 10px;
             border-radius: 5px;
             outline: none;
@@ -344,8 +344,8 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Nút bật chế độ Cài đặt giao diện (Dùng mũi tên Lên / Xuống) -->
-            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh bố cục giao diện">
+            <!-- Nút bật chế độ Cài đặt giao diện (Nhích Lên / Xuống) -->
+            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh vị trí giao diện">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
             <select class="style-select" id="themeStyleSelect" onchange="changeThemeStyle(this.value)" title="Chọn phong cách giao diện">
@@ -372,14 +372,14 @@
         <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
     </div>
 
-    <!-- Khung chính linh hoạt theo thứ tự sắp xếp của người dùng -->
+    <!-- Khung chính -->
     <div class="player-container-flex" id="playerContainerFlex">
         
         <!-- Module 1: Ảnh bìa & Tên -->
-        <div class="player-top-section player-module" id="moduleCoverTitle" data-order="1">
+        <div class="player-top-section player-module" id="moduleCoverTitle">
             <div class="module-toolbar">
-                <button class="move-btn" onclick="moveModuleUp('moduleCoverTitle')">⬆ Lên</button>
-                <button class="move-btn" onclick="moveModuleDown('moduleCoverTitle')">⬇ Xuống</button>
+                <button class="move-btn" onclick="nudgeModule('moduleCoverTitle', -10)">⬆ Lên</button>
+                <button class="move-btn" onclick="nudgeModule('moduleCoverTitle', 10)">⬇ Xuống</button>
             </div>
             <div class="player-cover-container">
                 <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
@@ -389,12 +389,12 @@
         </div>
 
         <!-- Module 2: Điều khiển & Tiến trình -->
-        <div class="player-bottom-section player-module" id="moduleControls" data-order="2">
+        <div class="player-bottom-section player-module" id="moduleControls">
             <div class="module-toolbar">
-                <button class="move-btn" onclick="moveModuleUp('moduleControls')">⬆ Lên</button>
-                <button class="move-btn" onclick="moveModuleDown('moduleControls')">⬇ Xuống</button>
+                <button class="move-btn" onclick="nudgeModule('moduleControls', -10)">⬆ Lên</button>
+                <button class="move-btn" onclick="nudgeModule('moduleControls', 10)">⬇ Xuống</button>
             </div>
-            <!-- Thanh tiến trình chuẩn Range Slider (mượt mà, không kẹt) -->
+            <!-- Thanh tiến trình có dải màu phủ tới nút tròn -->
             <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
             
             <div class="time-info-row">
@@ -564,19 +564,20 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            loadLayoutOrder();
+            loadModuleOffsets();
             
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
 
             loadStoryAndPlay();
 
-            // Lắng nghe liên tục thời gian audio để cập nhật thanh slider mượt mà tuyệt đối
+            // Cập nhật liên tục thanh tiến trình và dải màu đã phát
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isUserSeeking) {
                     const slider = document.getElementById('progressSlider');
                     const pct = (audioElement.currentTime / audioElement.duration) * 100;
                     slider.value = pct;
+                    updateSliderFill(pct);
                     document.getElementById('currentTimeText').textContent = formatTime(audioElement.currentTime);
                     document.getElementById('durationText').textContent = formatTime(audioElement.duration);
 
@@ -599,9 +600,16 @@
             });
         });
 
-        // Xử lý khi người dùng kéo trượt thanh tiến trình (Range Slider)
+        function updateSliderFill(val) {
+            const slider = document.getElementById('progressSlider');
+            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#f43f5e';
+            const cardBorder = getComputedStyle(document.body).getPropertyValue('--card-border').trim() || 'rgba(255,255,255,0.08)';
+            slider.style.background = `linear-gradient(to right, ${accentColor} ${val}%, ${cardBorder} ${val}%)`;
+        }
+
         function onSliderInput(val) {
             isUserSeeking = true;
+            updateSliderFill(val);
             if (audioElement.duration) {
                 const previewTime = (val / 100) * audioElement.duration;
                 document.getElementById('currentTimeText').textContent = formatTime(previewTime);
@@ -669,7 +677,6 @@
                     audioElement.src = audioUrl;
                     audioElement.playbackRate = currentPlaybackSpeed;
 
-                    // Kiểm tra lịch sử nghe trước đó
                     const savedTime = parseFloat(localStorage.getItem(`history_${currentStoryId}_${currentEpisodeIndex}`) || '0');
                     
                     audioElement.onloadedmetadata = () => {
@@ -680,7 +687,6 @@
                         }
                     };
 
-                    // Tự động phát ngay lập tức
                     audioElement.play().then(() => {
                         document.getElementById('playIcon').style.display = 'none';
                         document.getElementById('pauseIcon').style.display = 'block';
@@ -735,7 +741,6 @@
             }
         }
 
-        // Tốc độ phát audio toàn cục
         function openSpeedModal() {
             closeAllModals();
             document.getElementById('modalOverlay').classList.add('active');
@@ -760,7 +765,6 @@
             }
         }
 
-        // Hẹn giờ tắt & Đếm ngược
         function openSleepTimerModal() {
             closeAllModals();
             document.getElementById('modalOverlay').classList.add('active');
@@ -813,7 +817,6 @@
             document.getElementById('sleepCountdownText').textContent = formatTime(sleepTimerRemainingSeconds);
         }
 
-        // Danh sách tập audio
         function openPlaylistModal() {
             closeAllModals();
             const container = document.getElementById('playlistContainer');
@@ -838,8 +841,10 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh bố cục giao diện bằng nút Lên / Xuống
+        // Tùy chỉnh bố cục giao diện dạng "Nhích vị trí lên/xuống"
         let isCustomizing = false;
+        let moduleOffsets = JSON.parse(localStorage.getItem('playerModuleOffsets') || '{"moduleCoverTitle": 0, "moduleControls": 0}');
+
         function toggleLayoutCustomizer() {
             isCustomizing = !isCustomizing;
             const btn = document.getElementById('layoutToggleBtn');
@@ -847,53 +852,33 @@
             if (isCustomizing) {
                 document.body.classList.add('customizing-layout');
                 btn.classList.add('active-custom');
-                showToast('Đang bật chế độ chỉnh sửa giao diện. Dùng nút Lên/Xuống trên từng ô để dịch chuyển!');
+                showToast('Đang bật chế độ chỉnh sửa. Dùng nút Lên/Xuống để nhích vị trí ô!');
             } else {
                 document.body.classList.remove('customizing-layout');
                 btn.classList.remove('active-custom');
-                showToast('Đã lưu bố cục giao diện mới áp dụng toàn cục!');
+                showToast('Đã lưu vị trí bố cục mới!');
             }
         }
 
-        function moveModuleUp(moduleId) {
-            const el = document.getElementById(moduleId);
-            if (el && el.previousElementSibling && el.previousElementSibling.classList.contains('player-module')) {
-                el.parentNode.insertBefore(el, el.previousElementSibling);
-                saveLayoutOrder();
-                showToast('Đã di chuyển lên!');
-            }
+        function nudgeModule(moduleId, delta) {
+            if (moduleOffsets[moduleId] === undefined) moduleOffsets[moduleId] = 0;
+            moduleOffsets[moduleId] += delta;
+            localStorage.setItem('playerModuleOffsets', JSON.stringify(moduleOffsets));
+            applyModuleOffsets();
+            showToast(`Đã nhích vị trí ${delta < 0 ? 'lên' : 'xuống'}!`);
         }
 
-        function moveModuleDown(moduleId) {
-            const el = document.getElementById(moduleId);
-            if (el && el.nextElementSibling && el.nextElementSibling.classList.contains('player-module')) {
-                el.parentNode.insertBefore(el.nextElementSibling, el);
-                saveLayoutOrder();
-                showToast('Đã di chuyển xuống!');
-            }
-        }
-
-        function saveLayoutOrder() {
-            const container = document.getElementById('playerContainerFlex');
-            const modules = Array.from(container.querySelectorAll('.player-module'));
-            const orderIds = modules.map(m => m.id);
-            localStorage.setItem('playerLayoutOrder', JSON.stringify(orderIds));
-        }
-
-        function loadLayoutOrder() {
-            const saved = localStorage.getItem('playerLayoutOrder');
-            if (saved) {
-                try {
-                    const orderIds = JSON.parse(saved);
-                    const container = document.getElementById('playerContainerFlex');
-                    orderIds.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) container.appendChild(el);
-                    });
-                } catch (e) {
-                    console.error(e);
+        function applyModuleOffsets() {
+            for (const id in moduleOffsets) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.transform = `translateY(${moduleOffsets[id]}px)`;
                 }
             }
+        }
+
+        function loadModuleOffsets() {
+            applyModuleOffsets();
         }
 
         function closeAllModals() {
