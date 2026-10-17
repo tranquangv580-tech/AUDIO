@@ -103,7 +103,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hiệu ứng tinh vân vũ trụ */
+        /* Hiệu ứng tinh vân vũ trụ u tối chi tiết */
         .nebula-decorations {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none; z-index: -1; overflow: hidden; display: none;
@@ -130,17 +130,9 @@
             background-size: 450px 450px; opacity: 0.85;
         }
 
-        /* Phần công cụ 2 hàng */
-        .app-tools-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 14px;
-            z-index: 10;
-            flex-shrink: 0;
-        }
-        .app-header-row1 {
+        .app-header {
             display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; z-index: 10; flex-shrink: 0;
         }
         .header-actions { display: flex; gap: 8px; align-items: center; }
         .icon-btn {
@@ -158,46 +150,6 @@
             padding: 8px 12px; border-radius: 13px; font-size: 12px; font-weight: 700;
             font-family: var(--font-main); outline: none; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
-
-        /* Hàng thứ 2: Khối thông báo (Hẹn giờ bên trái, Lịch sử bên phải) */
-        .alerts-row2 {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-        }
-        .alert-badge-left {
-            display: none;
-            flex: 1;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: var(--accent-bg);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 8px 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 800;
-            box-shadow: 0 4px 12px var(--shadow-color);
-        }
-        .alert-badge-right {
-            display: none;
-            flex: 1;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: var(--card-bg);
-            border: 1px solid var(--accent);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            cursor: pointer;
-            text-align: center;
-        }
-        .alert-badge-right:hover { background: var(--card-hover); }
 
         /* Bảng điều khiển tinh chỉnh phần tử */
         .layout-control-panel {
@@ -232,6 +184,7 @@
         }
         .control-action-btn:active { background: var(--accent); color: #fff; transform: scale(0.9); }
 
+        /* Hiệu ứng chọn phần tử khi customizer bật */
         body.customizing-layout .player-module,
         body.customizing-layout .player-cover-container,
         body.customizing-layout .feature-item-btn,
@@ -245,28 +198,37 @@
             border-radius: 12px;
         }
 
-        /* Khung chính tổng hợp gộp chung thông tin truyện và điều khiển thành một khối lớn */
+        /* Khung chứa các thông báo hàng trên */
+        .alerts-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .sleep-timer-badge {
+            display: none; align-items: center; justify-content: center; gap: 6px;
+            background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
+            margin: 0 auto; width: fit-content; box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .history-banner {
+            display: none; align-items: center; justify-content: space-between;
+            background: var(--card-bg); border: 1px solid var(--accent); padding: 10px 14px;
+            border-radius: 14px; font-size: 12px; font-weight: 700;
+            box-shadow: 0 6px 20px var(--shadow-color); cursor: pointer;
+        }
+        .history-banner:hover { background: var(--card-hover); }
+
+        /* Khung chính điều khiển Flexbox cân đối chuẩn xác tuyệt đối */
         .player-container-flex { 
             display: flex; 
             flex-direction: column; 
-            justify-content: center;
-            gap: 14px; 
+            justify-content: space-between;
+            gap: 12px; 
             flex: 1; 
-        }
-
-        .player-combined-master-module {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 30px;
-            padding: 18px;
-            box-shadow: 0 10px 35px var(--shadow-color);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            position: relative;
-            transition: transform 0.2s ease;
         }
 
         .player-top-section { 
@@ -275,10 +237,13 @@
             align-items: center; 
             text-align: center; 
             position: relative; 
+            transition: transform 0.2s ease;
+            margin-top: auto;
+            margin-bottom: auto;
         }
         .player-cover-container {
-            width: 130px; height: 180px; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 8px 20px var(--shadow-color); border: 1px solid var(--card-border);
+            width: 140px; height: 196px; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 25px var(--shadow-color); border: 1px solid var(--card-border);
             margin-bottom: 10px; background: rgba(0,0,0,0.2); transition: transform 0.2s ease;
         }
         .player-cover { width: 100%; height: 100%; object-fit: cover; }
@@ -286,9 +251,10 @@
         .player-episode-title { font-size: 12px; font-weight: 700; color: var(--accent); margin: 0; }
 
         .player-bottom-section {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
+            background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border); border-radius: 28px; padding: 16px;
+            box-shadow: 0 8px 32px var(--shadow-color); position: relative; transition: transform 0.2s ease;
+            flex-shrink: 0;
         }
 
         /* Thanh tiến trình */
@@ -323,14 +289,14 @@
         .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; transition: transform 0.2s ease; }
         .control-btn {
             background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary);
-            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
             justify-content: center; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
         .control-btn:active { transform: scale(0.92); }
         .control-btn svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; }
 
         .play-pause-btn {
-            background: var(--accent); color: #fff; border: none; width: 54px; height: 54px;
+            background: var(--accent); color: #fff; border: none; width: 56px; height: 56px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 6px 20px var(--accent-bg);
         }
@@ -371,6 +337,13 @@
         }
         .sheet-title { font-size: 15px; font-weight: 800; margin: 0; color: var(--text-primary); }
         .close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; padding: 0; }
+
+        .sheet-option-btn {
+            width: 100%; background: var(--card-bg); border: 1px solid var(--card-border);
+            color: var(--text-primary); padding: 12px; border-radius: 12px; font-size: 13px;
+            font-weight: 700; cursor: pointer; margin-bottom: 8px; text-align: left;
+        }
+        .sheet-option-btn:hover, .sheet-option-btn.active { border-color: var(--accent); background: var(--card-hover); color: var(--accent); }
 
         .form-group { margin-bottom: 14px; }
         .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; }
@@ -427,92 +400,92 @@
         <button class="submit-btn" style="margin-top: 0; padding: 6px 12px; font-size: 12px; width: auto;" onclick="toggleLayoutCustomizer()">Xong</button>
     </div>
 
-    <div class="app-tools-container">
-        <!-- Hàng 1: Các nút chức năng và themes -->
-        <div class="app-header-row1">
-            <a href="detail.html" class="icon-btn" title="Quay lại chi tiết">
-                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-            </a>
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openBgMusicModal()" title="Cài đặt nhạc nền">
-                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                </button>
-                <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh giao diện">
-                    <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                </button>
-                <select class="style-select" id="themeStyleSelect" onchange="changeThemeStyle(this.value)" title="Chọn phong cách">
-                    <option value="default">✨ Cơ bản</option>
-                    <option value="nebula">🌌 Tinh vân</option>
-                    <option value="ocean">🌊 Đại dương đêm</option>
-                </select>
-                <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi Ngày / Đêm">
-                    <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                    <svg id="themeIconSun" viewBox="0 0 24 24" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Hàng 2: Khối thông báo (Hẹn giờ bên trái, Lịch sử bên phải chỉ hiện thời gian) -->
-        <div class="alerts-row2">
-            <div class="alert-badge-left" id="sleepTimerBadge">
-                <span>⏳</span>
-                <span id="sleepCountdownText">0:00:00</span>
-            </div>
-            <div class="alert-badge-right" id="historyBanner" onclick="dismissHistoryBanner()">
-                <span>📜 Tiếp tục: <strong id="historyBannerTimeText">0:00:00</strong></span>
-            </div>
+    <div class="app-header">
+        <a href="detail.html" class="icon-btn" title="Quay lại chi tiết">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </a>
+        <div class="header-actions">
+            <!-- Nút chức năng Nhạc Nền -->
+            <button class="icon-btn" onclick="openBgMusicModal()" title="Cài đặt nhạc nền">
+                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </button>
+            <!-- Nút bật chế độ Cài đặt giao diện tinh chỉnh -->
+            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh phần tử giao diện">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <select class="style-select" id="themeStyleSelect" onchange="changeThemeStyle(this.value)" title="Chọn phong cách giao diện">
+                <option value="default">✨ Cơ bản</option>
+                <option value="nebula">🌌 Tinh vân</option>
+                <option value="ocean">🌊 Đại dương đêm</option>
+            </select>
+            <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Ngày / Đêm">
+                <svg id="themeIconMoon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg id="themeIconSun" viewBox="0 0 24 24" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
         </div>
     </div>
 
-    <!-- Khung chính gộp chung khối thông tin truyện và điều khiển thành một khối master -->
+    <!-- Khung chính đồng bộ tuyệt đối -->
     <div class="player-container-flex" id="playerContainerFlex">
         
-        <div class="player-combined-master-module player-module" id="moduleCombinedMaster" data-name="Khối Gộp Tổng Thể">
-            <!-- Phần thông tin truyện -->
-            <div class="player-top-section" id="subElementCover" data-name="Khối Ảnh & Tên">
-                <div class="player-cover-container">
-                    <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
-                </div>
-                <h2 class="player-story-title" id="playerStoryTitle">Đang tải tên truyện...</h2>
-                <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
+        <div class="alerts-wrapper">
+            <!-- Khung đếm ngược hẹn giờ -->
+            <div class="sleep-timer-badge" id="sleepTimerBadge">
+                <span>⏳ Hẹn giờ tắt:</span>
+                <span id="sleepCountdownText">0:00:00</span>
             </div>
 
-            <!-- Phần điều khiển audio -->
-            <div class="player-bottom-section" id="subElementControls" data-name="Khối Điều Khiển Audio">
-                <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
-                
-                <div class="time-info-row">
-                    <span id="currentTimeText">0:00:00</span>
-                    <span id="durationText">0:00:00</span>
-                </div>
+            <!-- Thông báo lịch sử nghe trước đó -->
+            <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
+                <span id="historyBannerText">📜 Có lịch sử nghe trước đó. Bấm vào để tiếp tục!</span>
+                <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
+            </div>
+        </div>
 
-                <div class="controls-row">
-                    <button class="control-btn" onclick="skipTime(-10)" title="Lùi 10 giây">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
-                    </button>
-                    <button class="play-pause-btn" onclick="togglePlayPause()" id="playPauseMainBtn">
-                        <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                    </button>
-                    <button class="control-btn" onclick="skipTime(10)" title="Tới 10 giây">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
-                    </button>
-                </div>
+        <!-- Module 1: Ảnh bìa & Tên -->
+        <div class="player-top-section player-module" id="moduleCoverTitle" data-name="Khối Ảnh & Tên">
+            <div class="player-cover-container" id="subElementCover" data-name="Ảnh bìa">
+                <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
+            </div>
+            <h2 class="player-story-title" id="playerStoryTitle">Đang tải tên truyện...</h2>
+            <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
+        </div>
 
-                <div class="features-row" id="subElementFeatures" data-name="Hàng Tiện Ích">
-                    <button class="feature-item-btn" onclick="openSpeedModal()">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span id="speedLabelBtn">Tốc độ: 1.0x</span>
-                    </button>
-                    <button class="feature-item-btn" onclick="openSleepTimerModal()">
-                        <svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
-                        <span>Hẹn giờ tắt</span>
-                    </button>
-                    <button class="feature-item-btn" onclick="openPlaylistModal()">
-                        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                        <span>Danh sách tập</span>
-                    </button>
-                </div>
+        <!-- Module 2: Điều khiển & Tiến trình -->
+        <div class="player-bottom-section player-module" id="moduleControls" data-name="Khối Điều Khiển">
+            <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
+            
+            <div class="time-info-row">
+                <span id="currentTimeText">0:00:00</span>
+                <span id="durationText">0:00:00</span>
+            </div>
+
+            <div class="controls-row" id="subElementControls" data-name="Cụm Nút Phát">
+                <button class="control-btn" onclick="skipTime(-10)" title="Lùi 10 giây">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                </button>
+                <button class="play-pause-btn" onclick="togglePlayPause()" id="playPauseMainBtn">
+                    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                </button>
+                <button class="control-btn" onclick="skipTime(10)" title="Tới 10 giây">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                </button>
+            </div>
+
+            <div class="features-row" id="subElementFeatures" data-name="Hàng Tiện Ích">
+                <button class="feature-item-btn" onclick="openSpeedModal()">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="speedLabelBtn">Tốc độ: 1.0x</span>
+                </button>
+                <button class="feature-item-btn" onclick="openSleepTimerModal()">
+                    <svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                    <span>Hẹn giờ tắt</span>
+                </button>
+                <button class="feature-item-btn" onclick="openPlaylistModal()">
+                    <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    <span>Danh sách tập</span>
+                </button>
             </div>
         </div>
 
@@ -521,45 +494,36 @@
     <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-    <!-- Modal Nhạc Nền (Background Music) định dạng mới -->
+    <!-- Modal Nhạc Nền (Background Music) -->
     <div class="bottom-sheet" id="bgMusicModalSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Cài Đặt Nhạc Nền Phát Nền</h3>
+            <h3 class="sheet-title">Quản Lý Nhạc Nền Phát Kèm</h3>
             <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
         
-        <!-- Lựa chọn 1: Thêm nhạc nền -->
-        <div class="form-group" style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 14px; border: 1px solid var(--card-border);">
-            <label class="form-label">1. Thêm nhạc nền mới (MP3)</label>
-            <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Nhập tên nhạc nền..." style="margin-bottom: 8px;">
-            <input type="file" id="bgMusicFileInput" accept="audio/mp3, audio/*" style="display: none;" onchange="handleBgMusicFileSelected(this)">
-            <button class="submit-btn" style="margin-top: 0;" onclick="document.getElementById('bgMusicFileInput').click()">📁 Chọn tệp MP3 và Lưu</button>
-        </div>
-
-        <!-- Lựa chọn 2: Danh sách nhạc đã thêm -->
-        <div class="form-group" style="margin-top: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label class="form-label" style="margin-bottom: 0;">2. Danh sách nhạc đã thêm</label>
-                <div style="display: flex; gap: 6px;">
-                    <button class="submit-btn" style="margin-top: 0; padding: 4px 10px; font-size: 11px; background: #10b981;" onclick="saveBgMusicSelection()">💾 Lưu</button>
-                    <button class="submit-btn" style="margin-top: 0; padding: 4px 10px; font-size: 11px; background: #ef4444;" onclick="deleteSelectedBgMusic()">🗑️ Xóa</button>
-                </div>
+        <div class="form-group">
+            <label class="form-label">Thêm nhạc nền mới (MP3)</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Tên nhạc nền...">
+                <input type="file" id="bgMusicFileInput" accept="audio/mp3, audio/*" style="display: none;" onchange="handleBgMusicFileSelected(this)">
+                <button class="submit-btn" style="margin-top: 0; width: 130px;" onclick="document.getElementById('bgMusicFileInput').click()">📁 Chọn tệp</button>
             </div>
-            <div id="bgMusicListContainer" style="max-height: 25vh; overflow-y: auto;"></div>
         </div>
 
-        <!-- Tùy chỉnh âm lượng nền & Nghe thử -->
-        <div class="form-group" style="margin-top: 12px; border-top: 1px solid var(--card-border); padding-top: 12px;">
-            <label class="form-label">Âm lượng nhạc nền (Mặc định 30%)</label>
+        <div class="form-group">
+            <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="range" min="0" max="100" value="30" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromRange(this.value)">
-                <input type="number" min="0" max="100" value="30" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px;" oninput="updateBgVolumeFromNumber(this.value)">
-                <span style="font-size: 12px; font-weight: 700;">%</span>
+                <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumePreview(this.value)">
+                <button class="submit-btn" style="margin-top: 0; width: 110px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử</button>
             </div>
-            <button class="submit-btn" style="margin-top: 10px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử nhạc nền</button>
         </div>
 
-        <button class="submit-btn" style="margin-top: 14px;" onclick="closeAllModals()">Xong</button>
+        <div class="form-group" style="margin-top: 10px;">
+            <label class="form-label">Danh sách nhạc nền</label>
+            <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;"></div>
+        </div>
+
+        <button class="submit-btn" onclick="closeAllModals()">Xong</button>
     </div>
 
     <!-- Modal Tốc Độ -->
@@ -695,18 +659,17 @@
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
 
-        // Quản lý Nhạc nền
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
-        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.3'); // Mặc định 30% phù hợp nhất
+        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
             loadElementTransforms();
 
             bgAudioElement.volume = bgMusicVolume;
-            document.getElementById('bgVolumeRange').value = Math.round(bgMusicVolume * 100);
-            document.getElementById('bgVolumeNumberInput').value = Math.round(bgMusicVolume * 100);
+            document.getElementById('bgVolumeRange').value = bgMusicVolume * 100;
+            document.getElementById('bgVolumeVal').textContent = Math.round(bgMusicVolume * 100);
 
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
@@ -750,7 +713,6 @@
             });
         });
 
-        // Xử lý phát nhạc nền bền bỉ dưới nền
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -788,37 +750,23 @@
         function renderBgMusicList() {
             const container = document.getElementById('bgMusicListContainer');
             let html = `
-                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="tempSelectBgMusic('')">
+                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
                     <span>🚫 Không có nhạc nền</span>
                     <span>${!activeBgMusicId ? '✓' : ''}</span>
                 </div>
             `;
 
             html += bgMusicList.map(item => `
-                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}" onclick="tempSelectBgMusic('${item.id}')">
-                    <span>${escapeHtml(item.name)}</span>
-                    <span>${activeBgMusicId === item.id ? '✓' : ''}</span>
+                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}">
+                    <span onclick="selectBgMusic('${item.id}')">${escapeHtml(item.name)}</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span onclick="selectBgMusic('${item.id}')" style="font-size: 11px;">${activeBgMusicId === item.id ? 'Đang chọn' : 'Chọn'}</span>
+                        <button onclick="deleteBgMusic('${item.id}')" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 14px;" title="Xóa">🗑️</button>
+                    </div>
                 </div>
             `).join('');
 
             container.innerHTML = html;
-        }
-
-        let tempSelectedBgId = activeBgMusicId;
-        function tempSelectBgMusic(id) {
-            tempSelectedBgId = id;
-            // Highlight giao diện ngay lập tức
-            const items = document.querySelectorAll('#bgMusicListContainer .episode-list-item');
-            items.forEach((el, idx) => {
-                if (idx === 0) {
-                    el.classList.toggle('playing', id === '');
-                    el.querySelector('span:last-child').textContent = (id === '') ? '✓' : '';
-                } else {
-                    const track = bgMusicList[idx - 1];
-                    el.classList.toggle('playing', track && track.id === id);
-                    el.querySelector('span:last-child').textContent = (track && track.id === id) ? '✓' : '';
-                }
-            });
         }
 
         async function handleBgMusicFileSelected(input) {
@@ -838,7 +786,9 @@
                 tx.oncomplete = () => {
                     bgMusicList.push({ id: fileId, name: musicName });
                     localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-                    tempSelectBgMusic(fileId);
+                    if (!activeBgMusicId) {
+                        selectBgMusic(fileId);
+                    }
                     nameInput.value = '';
                     input.value = '';
                     renderBgMusicList();
@@ -850,86 +800,49 @@
             }
         }
 
-        function saveBgMusicSelection() {
-            activeBgMusicId = tempSelectedBgId;
-            localStorage.setItem('activeBgMusicId', activeBgMusicId);
+        function selectBgMusic(id) {
+            activeBgMusicId = id;
+            localStorage.setItem('activeBgMusicId', id);
             renderBgMusicList();
-            if (activeBgMusicId) {
+            if (id) {
                 playActiveBgMusic();
-                showToast('Đã lưu và bật nhạc nền!');
+                showToast('Đã bật nhạc nền!');
             } else {
                 bgAudioElement.pause();
-                showToast('Đã lưu chế độ Không nhạc nền');
+                showToast('Đã tắt nhạc nền');
             }
         }
 
-        async function deleteSelectedBgMusic() {
-            if (!tempSelectedBgId) {
-                showToast('Vui lòng chọn nhạc nền cần xóa trong danh sách!');
-                return;
-            }
-            bgMusicList = bgMusicList.filter(t => t.id !== tempSelectedBgId);
+        async function deleteBgMusic(id) {
+            bgMusicList = bgMusicList.filter(t => t.id !== id);
             localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-            if (activeBgMusicId === tempSelectedBgId) {
+            if (activeBgMusicId === id) {
                 activeBgMusicId = '';
                 localStorage.setItem('activeBgMusicId', '');
                 bgAudioElement.pause();
             }
-            tempSelectedBgId = '';
             renderBgMusicList();
-            showToast('Đã xóa nhạc nền thành công!');
+            showToast('Đã xóa nhạc nền!');
         }
 
-        function updateBgVolumeFromRange(val) {
-            document.getElementById('bgVolumeNumberInput').value = val;
-            applyBgVolume(val);
-        }
-
-        function updateBgVolumeFromNumber(val) {
-            let num = parseInt(val, 10);
-            if (isNaN(num)) num = 0;
-            num = Math.max(0, Math.min(100, num));
-            document.getElementById('bgVolumeRange').value = num;
-            applyBgVolume(num);
-        }
-
-        function applyBgVolume(val) {
+        function updateBgVolumePreview(val) {
             bgMusicVolume = val / 100;
             bgAudioElement.volume = bgMusicVolume;
             localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            document.getElementById('bgVolumeVal').textContent = val;
         }
 
         let isPreviewingBg = false;
         function toggleBgMusicPreview() {
             if (bgAudioElement.paused) {
-                if (!activeBgMusicId && !tempSelectedBgId) {
-                    showToast('Vui lòng chọn hoặc thêm nhạc nền trước!');
-                    return;
-                }
-                const targetId = tempSelectedBgId || activeBgMusicId;
-                const track = bgMusicList.find(t => t.id === targetId);
-                if (!track) return;
-
-                openDB('AudioBookDB_BgMusic').then(db => {
-                    const tx = db.transaction('audioBlobs', 'readonly');
-                    const store = tx.objectStore('audioBlobs');
-                    const req = store.get(track.fileId);
-                    req.onsuccess = function(e) {
-                        const blob = e.target.result;
-                        if (blob) {
-                            bgAudioElement.src = URL.createObjectURL(blob);
-                            bgAudioElement.volume = bgMusicVolume;
-                            bgAudioElement.play().then(() => {
-                                isPreviewingBg = true;
-                                document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng nghe thử';
-                            }).catch(err => showToast('Không thể phát thử tệp nhạc nền!'));
-                        }
-                    };
-                });
+                bgAudioElement.play().then(() => {
+                    isPreviewingBg = true;
+                    document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng';
+                }).catch(e => showToast('Hãy chọn nhạc nền trước!'));
             } else {
                 bgAudioElement.pause();
                 isPreviewingBg = false;
-                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử nhạc nền';
+                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử';
             }
         }
 
@@ -1015,7 +928,7 @@
                     audioElement.onloadedmetadata = () => {
                         if (savedTime > 5) {
                             pendingHistoryTime = savedTime;
-                            document.getElementById('historyBannerTimeText').textContent = formatTime(savedTime);
+                            document.getElementById('historyBannerText').textContent = `📜 Có lịch sử nghe tại ${formatTime(savedTime)}. Bấm để tiếp tục!`;
                             document.getElementById('historyBanner').style.display = 'flex';
                         }
                     };
@@ -1038,12 +951,8 @@
             if (pendingHistoryTime > 0 && audioElement.duration) {
                 audioElement.currentTime = pendingHistoryTime;
                 showToast(`Đã nhảy tới vị trí: ${formatTime(pendingHistoryTime)}`);
-                dismissHistoryBanner();
+                document.getElementById('historyBanner').style.display = 'none';
             }
-        }
-
-        function dismissHistoryBanner() {
-            document.getElementById('historyBanner').style.display = 'none';
         }
 
         function savePlaybackHistory(time) {
@@ -1178,7 +1087,7 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh chọn và tinh chỉnh phần tử giao diện gộp
+        // Tùy chỉnh chọn và tinh chỉnh phần tử
         let isCustomizing = false;
         let selectedElementId = null;
         let elementConfigs = JSON.parse(localStorage.getItem('playerElementConfigs') || '{}');
@@ -1190,7 +1099,7 @@
             if (isCustomizing) {
                 document.body.classList.add('customizing-layout');
                 btn.classList.add('active-custom');
-                showToast('Đang bật chế độ chỉnh sửa. Bấm vào khối hoặc thành phần bất kỳ để tùy chỉnh!');
+                showToast('Đang bật chế độ chỉnh sửa. Bấm vào khoảng trống hoặc thành phần bất kỳ để tùy chỉnh!');
                 setupElementClickListeners();
             } else {
                 document.body.classList.remove('customizing-layout');
