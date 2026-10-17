@@ -35,7 +35,7 @@
             --accent-light-light: rgba(225, 29, 72, 0.12);
         }
 
-        /* Phong cách: Tinh Vân (Nebula) - Tím tối huyền bí, nhiều tinh vân */
+        /* Phong cách: Tinh Vân (Nebula) - Tím tối huyền bí */
         body.theme-style-nebula {
             --bg-gradient: linear-gradient(135deg, #0f051d 0%, #1e0b36 40%, #110224 80%, #05010a 100%);
             --bg-fallback: #0f051d;
@@ -91,7 +91,7 @@
             color: var(--text-primary);
             font-family: var(--font-main);
             margin: 0;
-            padding: max(16px, env(safe-area-inset-top)) 16px max(30px, env(safe-area-inset-bottom));
+            padding: max(16px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
             max-width: 480px;
             margin-left: auto;
             margin-right: auto;
@@ -132,7 +132,7 @@
 
         .app-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 16px; z-index: 10;
+            margin-bottom: 12px; z-index: 10; flex-shrink: 0;
         }
         .header-actions { display: flex; gap: 8px; align-items: center; }
         .icon-btn {
@@ -151,7 +151,7 @@
             font-family: var(--font-main); outline: none; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
-        /* Bảng điều khiển tinh chỉnh phần tử (Hiện ra khi bật customizer thay cho các nút theme) */
+        /* Bảng điều khiển tinh chỉnh phần tử */
         .layout-control-panel {
             display: none;
             position: fixed;
@@ -198,46 +198,72 @@
             border-radius: 12px;
         }
 
+        /* Khung chứa các thông báo hàng trên */
+        .alerts-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
         .sleep-timer-badge {
             display: none; align-items: center; justify-content: center; gap: 6px;
             background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
             padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
-            margin: 0 auto 12px auto; width: fit-content; box-shadow: 0 4px 12px var(--shadow-color);
+            margin: 0 auto; width: fit-content; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
         .history-banner {
             display: none; align-items: center; justify-content: space-between;
             background: var(--card-bg); border: 1px solid var(--accent); padding: 10px 14px;
-            border-radius: 14px; margin-bottom: 14px; font-size: 12px; font-weight: 700;
+            border-radius: 14px; font-size: 12px; font-weight: 700;
             box-shadow: 0 6px 20px var(--shadow-color); cursor: pointer;
         }
         .history-banner:hover { background: var(--card-hover); }
 
-        .player-container-flex { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+        /* Khung chính điều khiển Flexbox cân đối chuẩn xác tuyệt đối */
+        .player-container-flex { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+            gap: 12px; 
+            flex: 1; 
+        }
 
-        .player-top-section { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; transition: transform 0.2s ease; }
+        .player-top-section { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            position: relative; 
+            transition: transform 0.2s ease;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
         .player-cover-container {
-            width: 150px; height: 210px; border-radius: 18px; overflow: hidden;
+            width: 140px; height: 196px; border-radius: 18px; overflow: hidden;
             box-shadow: 0 10px 25px var(--shadow-color); border: 1px solid var(--card-border);
-            margin-bottom: 12px; background: rgba(0,0,0,0.2); transition: transform 0.2s ease;
+            margin-bottom: 10px; background: rgba(0,0,0,0.2); transition: transform 0.2s ease;
         }
         .player-cover { width: 100%; height: 100%; object-fit: cover; }
-        .player-story-title { font-size: 16px; font-weight: 800; margin: 0 0 4px 0; color: var(--text-primary); }
-        .player-episode-title { font-size: 13px; font-weight: 700; color: var(--accent); margin: 0; }
+        .player-story-title { font-size: 15px; font-weight: 800; margin: 0 0 4px 0; color: var(--text-primary); }
+        .player-episode-title { font-size: 12px; font-weight: 700; color: var(--accent); margin: 0; }
 
         .player-bottom-section {
             background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border); border-radius: 28px; padding: 18px;
-            box-shadow: 0 8px 32px var(--shadow-color); margin-top: auto; position: relative; transition: transform 0.2s ease;
+            border: 1px solid var(--card-border); border-radius: 28px; padding: 16px;
+            box-shadow: 0 8px 32px var(--shadow-color); position: relative; transition: transform 0.2s ease;
+            flex-shrink: 0;
         }
 
-        /* Thanh tiến trình có dải màu phủ tới nút tròn */
+        /* Thanh tiến trình */
         .progress-slider {
             width: 100%;
             -webkit-appearance: none;
             appearance: none;
             background: linear-gradient(to right, var(--accent) 0%, var(--card-border) 0%);
-            height: 10px;
+            height: 8px;
             border-radius: 5px;
             outline: none;
             margin-bottom: 8px;
@@ -246,8 +272,8 @@
         .progress-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #ffffff;
             border: 3px solid var(--accent);
@@ -256,34 +282,34 @@
         }
 
         .time-info-row {
-            display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;
-            color: var(--text-secondary); margin-bottom: 16px;
+            display: flex; justify-content: space-between; font-size: 11px; font-weight: 700;
+            color: var(--text-secondary); margin-bottom: 12px;
         }
 
-        .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; transition: transform 0.2s ease; }
+        .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 14px; transition: transform 0.2s ease; }
         .control-btn {
             background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary);
-            width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center;
             justify-content: center; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
         .control-btn:active { transform: scale(0.92); }
-        .control-btn svg { width: 20px; height: 20px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; }
+        .control-btn svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor; stroke-width: 1.5; }
 
         .play-pause-btn {
-            background: var(--accent); color: #fff; border: none; width: 60px; height: 60px;
+            background: var(--accent); color: #fff; border: none; width: 56px; height: 56px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 6px 20px var(--accent-bg);
         }
         .play-pause-btn:active { transform: scale(0.92); }
-        .play-pause-btn svg { width: 26px; height: 26px; fill: currentColor; }
+        .play-pause-btn svg { width: 24px; height: 24px; fill: currentColor; }
 
         .features-row {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-            border-top: 1px solid var(--card-border); padding-top: 14px; transition: transform 0.2s ease;
+            border-top: 1px solid var(--card-border); padding-top: 12px; transition: transform 0.2s ease;
         }
         .feature-item-btn {
             background: rgba(0,0,0,0.1); border: 1px solid var(--card-border); color: var(--text-primary);
-            padding: 10px 6px; border-radius: 14px; font-size: 11px; font-weight: 700;
+            padding: 8px 4px; border-radius: 14px; font-size: 11px; font-weight: 700;
             font-family: var(--font-main); cursor: pointer; display: flex; flex-direction: column;
             align-items: center; gap: 4px; text-align: center;
         }
@@ -379,7 +405,7 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Nút chức năng Nhạc Nền mới -->
+            <!-- Nút chức năng Nhạc Nền -->
             <button class="icon-btn" onclick="openBgMusicModal()" title="Cài đặt nhạc nền">
                 <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </button>
@@ -399,21 +425,23 @@
         </div>
     </div>
 
-    <!-- Khung đếm ngược hẹn giờ nhỏ xinh ở trên cùng -->
-    <div class="sleep-timer-badge" id="sleepTimerBadge">
-        <span>⏳ Hẹn giờ tắt:</span>
-        <span id="sleepCountdownText">0:00:00</span>
-    </div>
-
-    <!-- Thông báo lịch sử nghe trước đó -->
-    <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
-        <span id="historyBannerText">📜 Có lịch sử nghe trước đó. Bấm vào để tiếp tục!</span>
-        <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
-    </div>
-
-    <!-- Khung chính -->
+    <!-- Khung chính đồng bộ tuyệt đối -->
     <div class="player-container-flex" id="playerContainerFlex">
         
+        <div class="alerts-wrapper">
+            <!-- Khung đếm ngược hẹn giờ -->
+            <div class="sleep-timer-badge" id="sleepTimerBadge">
+                <span>⏳ Hẹn giờ tắt:</span>
+                <span id="sleepCountdownText">0:00:00</span>
+            </div>
+
+            <!-- Thông báo lịch sử nghe trước đó -->
+            <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
+                <span id="historyBannerText">📜 Có lịch sử nghe trước đó. Bấm vào để tiếp tục!</span>
+                <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
+            </div>
+        </div>
+
         <!-- Module 1: Ảnh bìa & Tên -->
         <div class="player-top-section player-module" id="moduleCoverTitle" data-name="Khối Ảnh & Tên">
             <div class="player-cover-container" id="subElementCover" data-name="Ảnh bìa">
@@ -425,7 +453,6 @@
 
         <!-- Module 2: Điều khiển & Tiến trình -->
         <div class="player-bottom-section player-module" id="moduleControls" data-name="Khối Điều Khiển">
-            <!-- Thanh tiến trình có dải màu phủ tới nút tròn -->
             <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
             
             <div class="time-info-row">
@@ -493,9 +520,7 @@
 
         <div class="form-group" style="margin-top: 10px;">
             <label class="form-label">Danh sách nhạc nền</label>
-            <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;">
-                <!-- Danh sách load từ JS -->
-            </div>
+            <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;"></div>
         </div>
 
         <button class="submit-btn" onclick="closeAllModals()">Xong</button>
@@ -555,7 +580,7 @@
     <script>
         function initTheme() {
             const savedTheme = localStorage.getItem('appTheme') || 'dark';
-            const savedStyle = localStorage.getItem('appThemeStyle') || 'nebula'; // Mặc định Tinh vân
+            const savedStyle = localStorage.getItem('appThemeStyle') || 'nebula';
 
             document.getElementById('themeStyleSelect').value = savedStyle;
             applyThemeStyle(savedStyle);
@@ -626,7 +651,7 @@
 
         let audioElement = new Audio();
         let bgAudioElement = new Audio();
-        bgAudioElement.loop = true; // Hết nhạc nền tự động phát lại từ đầu
+        bgAudioElement.loop = true;
 
         let currentPlaybackSpeed = parseFloat(localStorage.getItem('globalAudioSpeed') || '1.0');
         let sleepTimerInterval = null;
@@ -634,7 +659,6 @@
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
 
-        // Quản lý Nhạc nền
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
         let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
@@ -652,7 +676,6 @@
 
             loadStoryAndPlay();
 
-            // Cập nhật liên tục thanh tiến trình và dải màu đã phát
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isUserSeeking) {
                     const slider = document.getElementById('progressSlider');
@@ -690,7 +713,6 @@
             });
         });
 
-        // Xử lý phát nhạc nền
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -1065,11 +1087,10 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh chọn và tinh chỉnh từng phần tử / cục giao diện
+        // Tùy chỉnh chọn và tinh chỉnh phần tử
         let isCustomizing = false;
         let selectedElementId = null;
         let elementConfigs = JSON.parse(localStorage.getItem('playerElementConfigs') || '{}');
-        // Cấu trúc config: { id: { y: 0, scale: 1 } }
 
         function toggleLayoutCustomizer() {
             isCustomizing = !isCustomizing;
@@ -1089,7 +1110,6 @@
         }
 
         function setupElementClickListeners() {
-            // Các module lớn và phần tử con
             const elements = document.querySelectorAll('.player-module, #subElementCover, #subElementControls, #subElementFeatures');
             elements.forEach(el => {
                 el.onclick = (e) => {
