@@ -184,7 +184,6 @@
         }
         .control-action-btn:active { background: var(--accent); color: #fff; transform: scale(0.9); }
 
-        /* Hiệu ứng chọn phần tử khi customizer bật */
         body.customizing-layout .player-module,
         body.customizing-layout .player-cover-container,
         body.customizing-layout .feature-item-btn,
@@ -198,31 +197,38 @@
             border-radius: 12px;
         }
 
-        /* Khung chứa các thông báo hàng trên */
-        .alerts-wrapper {
+        /* KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI (Không đẩy vùng khác) */
+        .floating-alerts-container {
+            position: fixed;
+            top: 76px;
+            right: 16px;
+            z-index: 900;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            width: 100%;
-            flex-shrink: 0;
+            align-items: flex-end;
+            pointer-events: none;
+            max-width: 240px;
         }
 
         .sleep-timer-badge {
             display: none; align-items: center; justify-content: center; gap: 6px;
-            background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800;
-            margin: 0 auto; width: fit-content; box-shadow: 0 4px 12px var(--shadow-color);
+            background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);
+            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;
+            box-shadow: 0 4px 15px var(--shadow-color); pointer-events: auto; backdrop-filter: blur(10px);
+            cursor: grab;
         }
 
         .history-banner {
-            display: none; align-items: center; justify-content: space-between;
-            background: var(--card-bg); border: 1px solid var(--accent); padding: 10px 14px;
-            border-radius: 14px; font-size: 12px; font-weight: 700;
-            box-shadow: 0 6px 20px var(--shadow-color); cursor: pointer;
+            display: none; align-items: center; justify-content: space-between; gap: 8px;
+            background: var(--card-bg); border: 1px solid var(--accent); padding: 8px 12px;
+            border-radius: 14px; font-size: 11px; font-weight: 700;
+            box-shadow: 0 6px 20px var(--shadow-color); cursor: pointer; pointer-events: auto;
+            backdrop-filter: blur(10px);
         }
         .history-banner:hover { background: var(--card-hover); }
 
-        /* Khung chính điều khiển Flexbox cân đối chuẩn xác tuyệt đối */
+        /* Khung chính điều khiển Flexbox */
         .player-container-flex { 
             display: flex; 
             flex-direction: column; 
@@ -388,7 +394,7 @@
         <div class="nebula-stars"></div>
     </div>
 
-    <!-- Bảng điều khiển tinh chỉnh phần tử nổi khi ở chế độ chỉnh sửa -->
+    <!-- Bảng điều khiển tinh chỉnh phần tử -->
     <div class="layout-control-panel" id="layoutControlPanel">
         <span class="control-group-title" id="selectedElementName">Chưa chọn ô</span>
         <div style="display: flex; gap: 6px;">
@@ -406,7 +412,7 @@
         </a>
         <div class="header-actions">
             <!-- Nút chức năng Nhạc Nền -->
-            <button class="icon-btn" onclick="openBgMusicModal()" title="Cài đặt nhạc nền">
+            <button class="icon-btn" onclick="openBgMusicMenuModal()" title="Cài đặt nhạc nền">
                 <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </button>
             <!-- Nút bật chế độ Cài đặt giao diện tinh chỉnh -->
@@ -425,23 +431,23 @@
         </div>
     </div>
 
-    <!-- Khung chính đồng bộ tuyệt đối -->
-    <div class="player-container-flex" id="playerContainerFlex">
-        
-        <div class="alerts-wrapper">
-            <!-- Khung đếm ngược hẹn giờ -->
-            <div class="sleep-timer-badge" id="sleepTimerBadge">
-                <span>⏳ Hẹn giờ tắt:</span>
-                <span id="sleepCountdownText">0:00:00</span>
-            </div>
-
-            <!-- Thông báo lịch sử nghe trước đó -->
-            <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
-                <span id="historyBannerText">📜 Có lịch sử nghe trước đó. Bấm vào để tiếp tục!</span>
-                <span style="color: var(--accent); font-weight: 850;">Nhảy tới ▶</span>
-            </div>
+    <!-- KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI -->
+    <div class="floating-alerts-container">
+        <!-- Khung đếm ngược hẹn giờ (Mặt đồng hồ nổi có thể di chuyển) -->
+        <div class="sleep-timer-badge" id="sleepTimerBadge" draggable="true">
+            <span>⏳ <span id="sleepCountdownText">0:00:00</span></span>
         </div>
 
+        <!-- Thông báo lịch sử nghe trước đó -->
+        <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
+            <span id="historyBannerText">📜 Có lịch sử nghe!</span>
+            <span style="color: var(--accent); font-weight: 850;">▶</span>
+        </div>
+    </div>
+
+    <!-- Khung chính -->
+    <div class="player-container-flex" id="playerContainerFlex">
+        
         <!-- Module 1: Ảnh bìa & Tên -->
         <div class="player-top-section player-module" id="moduleCoverTitle" data-name="Khối Ảnh & Tên">
             <div class="player-cover-container" id="subElementCover" data-name="Ảnh bìa">
@@ -494,42 +500,62 @@
     <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-    <!-- Modal Nhạc Nền (Background Music) -->
-    <div class="bottom-sheet" id="bgMusicModalSheet">
+    <!-- 1. BẢNG MENU CHÍNH NHẠC NỀN (2 LỰA CHỌN) -->
+    <div class="bottom-sheet" id="bgMusicMenuSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Quản Lý Nhạc Nền Phát Kèm</h3>
+            <h3 class="sheet-title">Cài Đặt Nhạc Nền</h3>
             <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
-        
-        <div class="form-group">
-            <label class="form-label">Thêm nhạc nền mới (MP3)</label>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Tên nhạc nền...">
-                <input type="file" id="bgMusicFileInput" accept="audio/mp3, audio/*" style="display: none;" onchange="handleBgMusicFileSelected(this)">
-                <button class="submit-btn" style="margin-top: 0; width: 130px;" onclick="document.getElementById('bgMusicFileInput').click()">📁 Chọn tệp</button>
-            </div>
-        </div>
+        <button class="sheet-option-btn" onclick="openBgMusicAddSheet()">➕ Thêm nhạc nền mới</button>
+        <button class="sheet-option-btn" onclick="openBgMusicListSheet()">📜 Danh sách nhạc đã thêm</button>
+    </div>
 
+    <!-- 2. BẢNG THÊM NHẠC NỀN -->
+    <div class="bottom-sheet" id="bgMusicAddSheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Thêm Tệp Nhạc Nền (MP3)</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
         <div class="form-group">
-            <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumePreview(this.value)">
-                <button class="submit-btn" style="margin-top: 0; width: 110px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử</button>
-            </div>
+            <label class="form-label">Tên nhạc nền</label>
+            <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Nhập tên nhạc nền...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Chọn tệp MP3</label>
+            <input type="file" class="form-input" id="bgMusicFileInput" accept="audio/mp3, audio/*">
+        </div>
+        <button class="submit-btn" onclick="saveNewBgMusicTrack()">Lưu & Thêm</button>
+        <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
+    </div>
+
+    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM -->
+    <div class="bottom-sheet" id="bgMusicListSheet">
+        <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <button class="icon-btn" onclick="saveAndCloseBgMusic()" title="Lưu">💾</button>
+            <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
+            <button class="icon-btn" style="color: var(--accent); border-color: var(--accent);" onclick="deleteSelectedBgTrack()" title="Xóa nhạc đang chọn">🗑️</button>
         </div>
 
         <div class="form-group" style="margin-top: 10px;">
-            <label class="form-label">Danh sách nhạc nền</label>
             <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;"></div>
         </div>
 
-        <button class="submit-btn" onclick="closeAllModals()">Xong</button>
+        <div class="form-group" style="border-top: 1px solid var(--card-border); padding-top: 12px;">
+            <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromSlider(this.value)" style="margin-bottom: 0;">
+                <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px;" oninput="updateBgVolumeFromNumber(this.value)">
+            </div>
+            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử</button>
+        </div>
+
+        <button class="submit-btn" onclick="saveAndCloseBgMusic()">Xong</button>
     </div>
 
     <!-- Modal Tốc Độ -->
     <div class="bottom-sheet" id="speedModalSheet">
         <div class="sheet-header">
-            <h3 class="sheet-title">Tốc Độ Phát Audio (Áp dụng toàn cục)</h3>
+            <h3 class="sheet-title">Tốc Độ Phát Audio</h3>
             <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(0.75)">0.75x - Chậm</button>
@@ -557,7 +583,7 @@
         <button class="sheet-option-btn" onclick="startSleepTimer(30)">Sau 30 phút</button>
         <button class="sheet-option-btn" onclick="startSleepTimer(60)">Sau 60 phút</button>
         <div class="form-group" style="margin-top: 12px;">
-            <label class="form-label">Hoặc nhập số phút tùy chỉnh</label>
+            <label class="form-label">Số phút tùy chỉnh</label>
             <div style="display: flex; gap: 8px;">
                 <input type="number" min="1" class="form-input" id="customMinutesInput" placeholder="Số phút...">
                 <button class="submit-btn" style="margin-top: 0; width: 100px;" onclick="applyCustomSleepTimer()">Bắt đầu</button>
@@ -607,7 +633,7 @@
         function changeThemeStyle(style) {
             localStorage.setItem('appThemeStyle', style);
             applyThemeStyle(style);
-            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? 'Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
+            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? ' Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
         }
 
         function applyThemeStyle(style) {
@@ -659,17 +685,20 @@
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
 
+        // Quản lý Nhạc nền
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
-        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
+        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5'); // Mặc định 50%
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
             loadElementTransforms();
 
             bgAudioElement.volume = bgMusicVolume;
-            document.getElementById('bgVolumeRange').value = bgMusicVolume * 100;
-            document.getElementById('bgVolumeVal').textContent = Math.round(bgMusicVolume * 100);
+            const volPct = Math.round(bgMusicVolume * 100);
+            document.getElementById('bgVolumeRange').value = volPct;
+            document.getElementById('bgVolumeNumberInput').value = volPct;
+            document.getElementById('bgVolumeVal').textContent = volPct;
 
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
@@ -704,15 +733,16 @@
                     currentEpisodeIndex++;
                     localStorage.setItem('currentEpisodeIndex', currentEpisodeIndex);
                     loadAndPlayCurrentEpisode();
-                    showToast('Đang tự động chuyển sang tập tiếp theo...');
+                    showToast('Đang tự động chuyển tập tiếp theo...');
                 } else {
                     document.getElementById('playIcon').style.display = 'block';
                     document.getElementById('pauseIcon').style.display = 'none';
-                    showToast('Đã phát hết danh sách tập audio!');
+                    showToast('Đã phát hết danh sách!');
                 }
             });
         });
 
+        // Phát nhạc nền đồng bộ
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -740,40 +770,36 @@
             }
         }
 
-        function openBgMusicModal() {
+        // Quy trình mở nhạc nền 2 lựa chọn
+        function openBgMusicMenuModal() {
+            closeAllModals();
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('bgMusicMenuSheet').classList.add('active');
+        }
+
+        function openBgMusicAddSheet() {
+            closeAllModals();
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('bgMusicAddSheet').classList.add('active');
+        }
+
+        function openBgMusicListSheet() {
             closeAllModals();
             renderBgMusicList();
             document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('bgMusicModalSheet').classList.add('active');
+            document.getElementById('bgMusicListSheet').classList.add('active');
         }
 
-        function renderBgMusicList() {
-            const container = document.getElementById('bgMusicListContainer');
-            let html = `
-                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
-                    <span>🚫 Không có nhạc nền</span>
-                    <span>${!activeBgMusicId ? '✓' : ''}</span>
-                </div>
-            `;
-
-            html += bgMusicList.map(item => `
-                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}">
-                    <span onclick="selectBgMusic('${item.id}')">${escapeHtml(item.name)}</span>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span onclick="selectBgMusic('${item.id}')" style="font-size: 11px;">${activeBgMusicId === item.id ? 'Đang chọn' : 'Chọn'}</span>
-                        <button onclick="deleteBgMusic('${item.id}')" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 14px;" title="Xóa">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
-
-            container.innerHTML = html;
-        }
-
-        async function handleBgMusicFileSelected(input) {
-            const file = input.files[0];
-            if (!file) return;
-
+        async function saveNewBgMusicTrack() {
             const nameInput = document.getElementById('bgMusicNameInput');
+            const fileInput = document.getElementById('bgMusicFileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showToast('Vui lòng chọn tệp MP3 nhạc nền!');
+                return;
+            }
+
             const musicName = nameInput.value.trim() || file.name.replace(/\.[^/.]+$/, "");
             const fileId = 'bg_' + Date.now();
 
@@ -787,12 +813,13 @@
                     bgMusicList.push({ id: fileId, name: musicName });
                     localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
                     if (!activeBgMusicId) {
-                        selectBgMusic(fileId);
+                        activeBgMusicId = fileId;
+                        localStorage.setItem('activeBgMusicId', fileId);
                     }
                     nameInput.value = '';
-                    input.value = '';
-                    renderBgMusicList();
-                    showToast(`Đã thêm nhạc nền: ${musicName}`);
+                    fileInput.value = '';
+                    showToast(`Đã thêm: ${musicName}`);
+                    openBgMusicListSheet();
                 };
             } catch (err) {
                 console.error(err);
@@ -800,50 +827,89 @@
             }
         }
 
+        function renderBgMusicList() {
+            const container = document.getElementById('bgMusicListContainer');
+            let html = `
+                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
+                    <span>🚫 Không có nhạc nền</span>
+                    <span>${!activeBgMusicId ? '✓' : ''}</span>
+                </div>
+            `;
+
+            html += bgMusicList.map(item => `
+                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}" onclick="selectBgMusic('${item.id}')">
+                    <span>${escapeHtml(item.name)}</span>
+                    <span>${activeBgMusicId === item.id ? '✓ Đang chọn' : ''}</span>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
         function selectBgMusic(id) {
             activeBgMusicId = id;
             localStorage.setItem('activeBgMusicId', id);
             renderBgMusicList();
-            if (id) {
-                playActiveBgMusic();
-                showToast('Đã bật nhạc nền!');
-            } else {
-                bgAudioElement.pause();
-                showToast('Đã tắt nhạc nền');
-            }
         }
 
-        async function deleteBgMusic(id) {
-            bgMusicList = bgMusicList.filter(t => t.id !== id);
-            localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-            if (activeBgMusicId === id) {
-                activeBgMusicId = '';
-                localStorage.setItem('activeBgMusicId', '');
-                bgAudioElement.pause();
+        function deleteSelectedBgTrack() {
+            if (!activeBgMusicId) {
+                showToast('Chưa chọn bản nhạc nào để xóa!');
+                return;
             }
+            bgMusicList = bgMusicList.filter(t => t.id !== activeBgMusicId);
+            localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
+            activeBgMusicId = '';
+            localStorage.setItem('activeBgMusicId', '');
+            bgAudioElement.pause();
             renderBgMusicList();
             showToast('Đã xóa nhạc nền!');
         }
 
-        function updateBgVolumePreview(val) {
+        function updateBgVolumeFromSlider(val) {
             bgMusicVolume = val / 100;
             bgAudioElement.volume = bgMusicVolume;
             localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            document.getElementById('bgVolumeNumberInput').value = val;
             document.getElementById('bgVolumeVal').textContent = val;
+        }
+
+        function updateBgVolumeFromNumber(val) {
+            let num = parseInt(val, 10);
+            if (isNaN(num)) num = 0;
+            num = Math.min(Math.max(num, 0), 100);
+            bgMusicVolume = num / 100;
+            bgAudioElement.volume = bgMusicVolume;
+            localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            document.getElementById('bgVolumeRange').value = num;
+            document.getElementById('bgVolumeVal').textContent = num;
         }
 
         let isPreviewingBg = false;
         function toggleBgMusicPreview() {
+            if (!activeBgMusicId) {
+                showToast('Vui lòng chọn một bài nhạc nền trước!');
+                return;
+            }
             if (bgAudioElement.paused) {
-                bgAudioElement.play().then(() => {
-                    isPreviewingBg = true;
-                    document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng';
-                }).catch(e => showToast('Hãy chọn nhạc nền trước!'));
+                playActiveBgMusic();
+                isPreviewingBg = true;
+                document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng nghe thử';
             } else {
                 bgAudioElement.pause();
                 isPreviewingBg = false;
                 document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử';
             }
+        }
+
+        function saveAndCloseBgMusic() {
+            if (activeBgMusicId && !audioElement.paused) {
+                playActiveBgMusic();
+            } else {
+                bgAudioElement.pause();
+            }
+            closeAllModals();
+            showToast('Đã lưu cài đặt nhạc nền!');
         }
 
         function updateSliderFill(val) {
@@ -928,7 +994,7 @@
                     audioElement.onloadedmetadata = () => {
                         if (savedTime > 5) {
                             pendingHistoryTime = savedTime;
-                            document.getElementById('historyBannerText').textContent = `📜 Có lịch sử nghe tại ${formatTime(savedTime)}. Bấm để tiếp tục!`;
+                            document.getElementById('historyBannerText').textContent = `📜 Lịch sử: ${formatTime(savedTime)}`;
                             document.getElementById('historyBanner').style.display = 'flex';
                         }
                     };
@@ -938,7 +1004,7 @@
                         document.getElementById('pauseIcon').style.display = 'block';
                     }).catch(err => {
                         console.error('Autoplay bị chặn:', err);
-                        showToast('Bấm nút Play để phát audio.');
+                        showToast('Bấm nút Play để phát.');
                     });
                 };
             } catch (err) {
@@ -950,7 +1016,7 @@
         function jumpToHistoryTime() {
             if (pendingHistoryTime > 0 && audioElement.duration) {
                 audioElement.currentTime = pendingHistoryTime;
-                showToast(`Đã nhảy tới vị trí: ${formatTime(pendingHistoryTime)}`);
+                showToast(`Đã nhảy tới: ${formatTime(pendingHistoryTime)}`);
                 document.getElementById('historyBanner').style.display = 'none';
             }
         }
@@ -999,7 +1065,7 @@
             localStorage.setItem('globalAudioSpeed', speed);
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${speed}x`;
             closeAllModals();
-            showToast(`Đã áp dụng tốc độ toàn cục: ${speed}x`);
+            showToast(`Đã áp dụng tốc độ: ${speed}x`);
         }
 
         function applyCustomSpeed() {
@@ -1087,7 +1153,7 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh chọn và tinh chỉnh phần tử
+        // Tùy chỉnh bố cục giao diện
         let isCustomizing = false;
         let selectedElementId = null;
         let elementConfigs = JSON.parse(localStorage.getItem('playerElementConfigs') || '{}');
@@ -1099,13 +1165,13 @@
             if (isCustomizing) {
                 document.body.classList.add('customizing-layout');
                 btn.classList.add('active-custom');
-                showToast('Đang bật chế độ chỉnh sửa. Bấm vào khoảng trống hoặc thành phần bất kỳ để tùy chỉnh!');
+                showToast('Đang bật chỉnh sửa giao diện!');
                 setupElementClickListeners();
             } else {
                 document.body.classList.remove('customizing-layout');
                 btn.classList.remove('active-custom');
                 clearElementSelection();
-                showToast('Đã lưu tùy chỉnh giao diện thành công!');
+                showToast('Đã lưu giao diện!');
             }
         }
 
@@ -1138,7 +1204,7 @@
 
         function adjustSelectedElement(action) {
             if (!selectedElementId) {
-                showToast('Vui lòng chạm chọn một ô hoặc phần tử trước!');
+                showToast('Vui lòng chọn một ô trước!');
                 return;
             }
 
