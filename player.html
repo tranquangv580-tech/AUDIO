@@ -35,12 +35,12 @@
             --accent-light-light: rgba(225, 29, 72, 0.12);
         }
 
-        /* Phong cách: Trời Sao (Starry Night) */
-        body.theme-style-starry {
-            --bg-gradient: linear-gradient(135deg, #09091b 0%, #171033 50%, #2e1065 100%);
-            --bg-fallback: #09091b;
-            --accent: #fef08a;
-            --accent-bg: rgba(254, 240, 138, 0.2);
+        /* Phong cách: Tinh Vân (Nebula) - Tím tối huyền bí, nhiều tinh vân */
+        body.theme-style-nebula {
+            --bg-gradient: linear-gradient(135deg, #0f051d 0%, #1e0b36 40%, #110224 80%, #05010a 100%);
+            --bg-fallback: #0f051d;
+            --accent: #d946ef;
+            --accent-bg: rgba(217, 70, 239, 0.25);
         }
 
         /* Phong cách: Đại Dương Ban Đêm (Midnight Ocean) */
@@ -75,7 +75,7 @@
             --text-primary: var(--text-primary-light);
             --text-secondary: var(--text-secondary-light);
             --accent: var(--accent-color-light);
-            --accent-bg: var(--accent-light-light);
+            --accent-light: var(--accent-light-light);
             --shadow-color: rgba(148, 163, 184, 0.25);
         }
 
@@ -103,55 +103,31 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Chế độ chỉnh sửa giao diện hiển thị các nút nhích Lên / Xuống */
-        .layout-grid-overlay {
-            position: fixed; inset: 0; pointer-events: none; z-index: 999; display: none;
-            background-image: linear-gradient(to right, rgba(244, 63, 94, 0.15) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(244, 63, 94, 0.15) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-        body.customizing-layout .layout-grid-overlay { display: block; }
-        body.customizing-layout .player-module {
-            outline: 2px dashed var(--accent);
-            position: relative;
-        }
-        .module-toolbar {
-            display: none;
-            position: absolute;
-            top: 8px; right: 8px;
-            z-index: 10;
-            gap: 4px;
-        }
-        body.customizing-layout .module-toolbar { display: flex; }
-        .move-btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
-        .move-btn:active { transform: scale(0.9); }
-
-        .sky-decorations {
+        /* Hiệu ứng tinh vân vũ trụ u tối chi tiết */
+        .nebula-decorations {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: -1; overflow: hidden;
+            pointer-events: none; z-index: -1; overflow: hidden; display: none;
         }
-        .moon {
-            position: absolute; top: 40px; right: 8%; width: 60px; height: 60px;
-            border-radius: 50%; box-shadow: -10px 8px 0 2px #fef08a, 0 0 20px rgba(254, 240, 138, 0.25);
-            opacity: 0.9;
+        body.theme-style-nebula .nebula-decorations { display: block; }
+        .nebula-cloud-1 {
+            position: absolute; top: -10%; left: -10%; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(88, 28, 135, 0.1) 50%, transparent 70%);
+            border-radius: 50%; filter: blur(40px);
         }
-        .stars {
+        .nebula-cloud-2 {
+            position: absolute; bottom: 10%; right: -20%; width: 70vw; height: 70vw;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(126, 34, 206, 0.1) 60%, transparent 80%);
+            border-radius: 50%; filter: blur(50px);
+        }
+        .nebula-stars {
             position: absolute; inset: 0;
             background-image: 
-                radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                radial-gradient(1.5px 1.5px at 80px 120px, #fef08a, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 200px 70px, #ffffff, rgba(0,0,0,0));
-            background-size: 500px 500px; opacity: 0.7;
+                radial-gradient(1.5px 1.5px at 15px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 150px, #f472b6, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 220px 80px, #c084fc, rgba(0,0,0,0)),
+                radial-gradient(2.5px 2.5px at 350px 280px, #e879f9, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 400px 100px, #ffffff, rgba(0,0,0,0));
+            background-size: 450px 450px; opacity: 0.85;
         }
 
         .app-header {
@@ -175,6 +151,53 @@
             font-family: var(--font-main); outline: none; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
+        /* Bảng điều khiển tinh chỉnh phần tử (Hiện ra khi bật customizer thay cho các nút theme) */
+        .layout-control-panel {
+            display: none;
+            position: fixed;
+            bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--accent);
+            padding: 12px 16px;
+            border-radius: 20px;
+            z-index: 1050;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            align-items: center;
+            gap: 12px;
+            animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        body.customizing-layout .layout-control-panel { display: flex; }
+        body.customizing-layout .style-select,
+        body.customizing-layout #themeToggleBtn { display: none !important; }
+
+        .control-group-title {
+            font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-right: 4px;
+        }
+        .control-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+        }
+        .control-action-btn:active { background: var(--accent); color: #fff; transform: scale(0.9); }
+
+        /* Hiệu ứng chọn phần tử khi customizer bật */
+        body.customizing-layout .player-module,
+        body.customizing-layout .player-cover-container,
+        body.customizing-layout .feature-item-btn,
+        body.customizing-layout .controls-row {
+            cursor: pointer;
+            transition: outline 0.2s ease;
+        }
+        body.customizing-layout .player-module.selected-element,
+        body.customizing-layout .selected-sub-element {
+            outline: 3px solid var(--accent) !important;
+            border-radius: 12px;
+        }
+
         .sleep-timer-badge {
             display: none; align-items: center; justify-content: center; gap: 6px;
             background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent);
@@ -196,7 +219,7 @@
         .player-cover-container {
             width: 150px; height: 210px; border-radius: 18px; overflow: hidden;
             box-shadow: 0 10px 25px var(--shadow-color); border: 1px solid var(--card-border);
-            margin-bottom: 12px; background: rgba(0,0,0,0.2); pointer-events: none;
+            margin-bottom: 12px; background: rgba(0,0,0,0.2); transition: transform 0.2s ease;
         }
         .player-cover { width: 100%; height: 100%; object-fit: cover; }
         .player-story-title { font-size: 16px; font-weight: 800; margin: 0 0 4px 0; color: var(--text-primary); }
@@ -208,7 +231,7 @@
             box-shadow: 0 8px 32px var(--shadow-color); margin-top: auto; position: relative; transition: transform 0.2s ease;
         }
 
-        /* Thanh tiến trình với dải màu thể hiện đoạn đã qua tới chỗ nút tròn */
+        /* Thanh tiến trình có dải màu phủ tới nút tròn */
         .progress-slider {
             width: 100%;
             -webkit-appearance: none;
@@ -237,7 +260,7 @@
             color: var(--text-secondary); margin-bottom: 16px;
         }
 
-        .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; }
+        .controls-row { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 18px; transition: transform 0.2s ease; }
         .control-btn {
             background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary);
             width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center;
@@ -256,7 +279,7 @@
 
         .features-row {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-            border-top: 1px solid var(--card-border); padding-top: 14px;
+            border-top: 1px solid var(--card-border); padding-top: 14px; transition: transform 0.2s ease;
         }
         .feature-item-btn {
             background: rgba(0,0,0,0.1); border: 1px solid var(--card-border); color: var(--text-primary);
@@ -332,11 +355,23 @@
 </head>
 <body>
 
-    <div class="layout-grid-overlay" id="layoutGridOverlay"></div>
+    <!-- Hiệu ứng không gian tinh vân -->
+    <div class="nebula-decorations">
+        <div class="nebula-cloud-1"></div>
+        <div class="nebula-cloud-2"></div>
+        <div class="nebula-stars"></div>
+    </div>
 
-    <div class="sky-decorations">
-        <div class="moon"></div>
-        <div class="stars"></div>
+    <!-- Bảng điều khiển tinh chỉnh phần tử nổi khi ở chế độ chỉnh sửa -->
+    <div class="layout-control-panel" id="layoutControlPanel">
+        <span class="control-group-title" id="selectedElementName">Chưa chọn ô</span>
+        <div style="display: flex; gap: 6px;">
+            <button class="control-action-btn" onclick="adjustSelectedElement('up')" title="Nhích lên">⬆</button>
+            <button class="control-action-btn" onclick="adjustSelectedElement('down')" title="Nhích xuống">⬇</button>
+            <button class="control-action-btn" onclick="adjustSelectedElement('zoomIn')" title="Phóng to">➕</button>
+            <button class="control-action-btn" onclick="adjustSelectedElement('zoomOut')" title="Thu nhỏ">➖</button>
+        </div>
+        <button class="submit-btn" style="margin-top: 0; padding: 6px 12px; font-size: 12px; width: auto;" onclick="toggleLayoutCustomizer()">Xong</button>
     </div>
 
     <div class="app-header">
@@ -344,13 +379,17 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Nút bật chế độ Cài đặt giao diện (Nhích Lên / Xuống) -->
-            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh vị trí giao diện">
+            <!-- Nút chức năng Nhạc Nền mới -->
+            <button class="icon-btn" onclick="openBgMusicModal()" title="Cài đặt nhạc nền">
+                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </button>
+            <!-- Nút bật chế độ Cài đặt giao diện tinh chỉnh -->
+            <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh phần tử giao diện">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
             <select class="style-select" id="themeStyleSelect" onchange="changeThemeStyle(this.value)" title="Chọn phong cách giao diện">
                 <option value="default">✨ Cơ bản</option>
-                <option value="starry">🌌 Trời sao</option>
+                <option value="nebula">🌌 Tinh vân</option>
                 <option value="ocean">🌊 Đại dương đêm</option>
             </select>
             <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Đổi giao diện Ngày / Đêm">
@@ -376,12 +415,8 @@
     <div class="player-container-flex" id="playerContainerFlex">
         
         <!-- Module 1: Ảnh bìa & Tên -->
-        <div class="player-top-section player-module" id="moduleCoverTitle">
-            <div class="module-toolbar">
-                <button class="move-btn" onclick="nudgeModule('moduleCoverTitle', -10)">⬆ Lên</button>
-                <button class="move-btn" onclick="nudgeModule('moduleCoverTitle', 10)">⬇ Xuống</button>
-            </div>
-            <div class="player-cover-container">
+        <div class="player-top-section player-module" id="moduleCoverTitle" data-name="Khối Ảnh & Tên">
+            <div class="player-cover-container" id="subElementCover" data-name="Ảnh bìa">
                 <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
             </div>
             <h2 class="player-story-title" id="playerStoryTitle">Đang tải tên truyện...</h2>
@@ -389,11 +424,7 @@
         </div>
 
         <!-- Module 2: Điều khiển & Tiến trình -->
-        <div class="player-bottom-section player-module" id="moduleControls">
-            <div class="module-toolbar">
-                <button class="move-btn" onclick="nudgeModule('moduleControls', -10)">⬆ Lên</button>
-                <button class="move-btn" onclick="nudgeModule('moduleControls', 10)">⬇ Xuống</button>
-            </div>
+        <div class="player-bottom-section player-module" id="moduleControls" data-name="Khối Điều Khiển">
             <!-- Thanh tiến trình có dải màu phủ tới nút tròn -->
             <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
             
@@ -402,7 +433,7 @@
                 <span id="durationText">0:00:00</span>
             </div>
 
-            <div class="controls-row">
+            <div class="controls-row" id="subElementControls" data-name="Cụm Nút Phát">
                 <button class="control-btn" onclick="skipTime(-10)" title="Lùi 10 giây">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
                 </button>
@@ -415,7 +446,7 @@
                 </button>
             </div>
 
-            <div class="features-row">
+            <div class="features-row" id="subElementFeatures" data-name="Hàng Tiện Ích">
                 <button class="feature-item-btn" onclick="openSpeedModal()">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <span id="speedLabelBtn">Tốc độ: 1.0x</span>
@@ -435,6 +466,40 @@
 
     <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+    <!-- Modal Nhạc Nền (Background Music) -->
+    <div class="bottom-sheet" id="bgMusicModalSheet">
+        <div class="sheet-header">
+            <h3 class="sheet-title">Quản Lý Nhạc Nền Phát Kèm</h3>
+            <button class="close-btn" onclick="closeAllModals()">&times;</button>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Thêm nhạc nền mới (MP3)</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Tên nhạc nền...">
+                <input type="file" id="bgMusicFileInput" accept="audio/mp3, audio/*" style="display: none;" onchange="handleBgMusicFileSelected(this)">
+                <button class="submit-btn" style="margin-top: 0; width: 130px;" onclick="document.getElementById('bgMusicFileInput').click()">📁 Chọn tệp</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumePreview(this.value)">
+                <button class="submit-btn" style="margin-top: 0; width: 110px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử</button>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+            <label class="form-label">Danh sách nhạc nền</label>
+            <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;">
+                <!-- Danh sách load từ JS -->
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="closeAllModals()">Xong</button>
+    </div>
 
     <!-- Modal Tốc Độ -->
     <div class="bottom-sheet" id="speedModalSheet">
@@ -490,7 +555,7 @@
     <script>
         function initTheme() {
             const savedTheme = localStorage.getItem('appTheme') || 'dark';
-            const savedStyle = localStorage.getItem('appThemeStyle') || 'default';
+            const savedStyle = localStorage.getItem('appThemeStyle') || 'nebula'; // Mặc định Tinh vân
 
             document.getElementById('themeStyleSelect').value = savedStyle;
             applyThemeStyle(savedStyle);
@@ -517,13 +582,13 @@
         function changeThemeStyle(style) {
             localStorage.setItem('appThemeStyle', style);
             applyThemeStyle(style);
-            showToast(`Đã đổi phong cách: ${style === 'starry' ? 'Trời sao 🌌' : style === 'ocean' ? 'Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
+            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? 'Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
         }
 
         function applyThemeStyle(style) {
-            document.body.classList.remove('theme-style-starry', 'theme-style-ocean');
-            if (style === 'starry') {
-                document.body.classList.add('theme-style-starry');
+            document.body.classList.remove('theme-style-nebula', 'theme-style-ocean');
+            if (style === 'nebula') {
+                document.body.classList.add('theme-style-nebula');
             } else if (style === 'ocean') {
                 document.body.classList.add('theme-style-ocean');
             }
@@ -542,9 +607,13 @@
             }, 3000);
         }
 
-        function openDB() {
+        function openDB(dbName = 'AudioBookDB_Files') {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('AudioBookDB_Files', 1);
+                const request = indexedDB.open(dbName, 1);
+                request.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('audioBlobs')) db.createObjectStore('audioBlobs');
+                };
                 request.onsuccess = e => resolve(e.target.result);
                 request.onerror = e => reject(e.target.error);
             });
@@ -556,16 +625,28 @@
         let currentStory = null;
 
         let audioElement = new Audio();
+        let bgAudioElement = new Audio();
+        bgAudioElement.loop = true; // Hết nhạc nền tự động phát lại từ đầu
+
         let currentPlaybackSpeed = parseFloat(localStorage.getItem('globalAudioSpeed') || '1.0');
         let sleepTimerInterval = null;
         let sleepTimerRemainingSeconds = 0;
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
 
+        // Quản lý Nhạc nền
+        let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
+        let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
+        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
+
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
-            loadModuleOffsets();
-            
+            loadElementTransforms();
+
+            bgAudioElement.volume = bgMusicVolume;
+            document.getElementById('bgVolumeRange').value = bgMusicVolume * 100;
+            document.getElementById('bgVolumeVal').textContent = Math.round(bgMusicVolume * 100);
+
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
 
@@ -585,8 +666,17 @@
                 }
             });
 
+            audioElement.addEventListener('play', () => {
+                playActiveBgMusic();
+            });
+
+            audioElement.addEventListener('pause', () => {
+                bgAudioElement.pause();
+            });
+
             audioElement.addEventListener('ended', () => {
                 savePlaybackHistory(0);
+                bgAudioElement.pause();
                 if (currentStory && currentStory.episodes && currentEpisodeIndex < currentStory.episodes.length - 1) {
                     currentEpisodeIndex++;
                     localStorage.setItem('currentEpisodeIndex', currentEpisodeIndex);
@@ -599,6 +689,140 @@
                 }
             });
         });
+
+        // Xử lý phát nhạc nền
+        async function playActiveBgMusic() {
+            if (!activeBgMusicId) return;
+            const track = bgMusicList.find(t => t.id === activeBgMusicId);
+            if (!track) return;
+
+            try {
+                const db = await openDB('AudioBookDB_BgMusic');
+                const tx = db.transaction('audioBlobs', 'readonly');
+                const store = tx.objectStore('audioBlobs');
+                const req = store.get(track.fileId);
+
+                req.onsuccess = function(e) {
+                    const blob = e.target.result;
+                    if (blob) {
+                        const url = URL.createObjectURL(blob);
+                        if (bgAudioElement.src !== url) {
+                            bgAudioElement.src = url;
+                        }
+                        bgAudioElement.volume = bgMusicVolume;
+                        bgAudioElement.play().catch(err => console.log('BgMusic play prevented:', err));
+                    }
+                };
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function openBgMusicModal() {
+            closeAllModals();
+            renderBgMusicList();
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('bgMusicModalSheet').classList.add('active');
+        }
+
+        function renderBgMusicList() {
+            const container = document.getElementById('bgMusicListContainer');
+            let html = `
+                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
+                    <span>🚫 Không có nhạc nền</span>
+                    <span>${!activeBgMusicId ? '✓' : ''}</span>
+                </div>
+            `;
+
+            html += bgMusicList.map(item => `
+                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}">
+                    <span onclick="selectBgMusic('${item.id}')">${escapeHtml(item.name)}</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span onclick="selectBgMusic('${item.id}')" style="font-size: 11px;">${activeBgMusicId === item.id ? 'Đang chọn' : 'Chọn'}</span>
+                        <button onclick="deleteBgMusic('${item.id}')" style="background: transparent; border: none; color: var(--accent); cursor: pointer; font-size: 14px;" title="Xóa">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        async function handleBgMusicFileSelected(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const nameInput = document.getElementById('bgMusicNameInput');
+            const musicName = nameInput.value.trim() || file.name.replace(/\.[^/.]+$/, "");
+            const fileId = 'bg_' + Date.now();
+
+            try {
+                const db = await openDB('AudioBookDB_BgMusic');
+                const tx = db.transaction('audioBlobs', 'readwrite');
+                const store = tx.objectStore('audioBlobs');
+                store.put(file, fileId);
+
+                tx.oncomplete = () => {
+                    bgMusicList.push({ id: fileId, name: musicName });
+                    localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
+                    if (!activeBgMusicId) {
+                        selectBgMusic(fileId);
+                    }
+                    nameInput.value = '';
+                    input.value = '';
+                    renderBgMusicList();
+                    showToast(`Đã thêm nhạc nền: ${musicName}`);
+                };
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi lưu tệp nhạc nền!');
+            }
+        }
+
+        function selectBgMusic(id) {
+            activeBgMusicId = id;
+            localStorage.setItem('activeBgMusicId', id);
+            renderBgMusicList();
+            if (id) {
+                playActiveBgMusic();
+                showToast('Đã bật nhạc nền!');
+            } else {
+                bgAudioElement.pause();
+                showToast('Đã tắt nhạc nền');
+            }
+        }
+
+        async function deleteBgMusic(id) {
+            bgMusicList = bgMusicList.filter(t => t.id !== id);
+            localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
+            if (activeBgMusicId === id) {
+                activeBgMusicId = '';
+                localStorage.setItem('activeBgMusicId', '');
+                bgAudioElement.pause();
+            }
+            renderBgMusicList();
+            showToast('Đã xóa nhạc nền!');
+        }
+
+        function updateBgVolumePreview(val) {
+            bgMusicVolume = val / 100;
+            bgAudioElement.volume = bgMusicVolume;
+            localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            document.getElementById('bgVolumeVal').textContent = val;
+        }
+
+        let isPreviewingBg = false;
+        function toggleBgMusicPreview() {
+            if (bgAudioElement.paused) {
+                bgAudioElement.play().then(() => {
+                    isPreviewingBg = true;
+                    document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng';
+                }).catch(e => showToast('Hãy chọn nhạc nền trước!'));
+            } else {
+                bgAudioElement.pause();
+                isPreviewingBg = false;
+                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử';
+            }
+        }
 
         function updateSliderFill(val) {
             const slider = document.getElementById('progressSlider');
@@ -661,7 +885,7 @@
             document.getElementById('playerEpisodeTitle').textContent = ep.name;
 
             try {
-                const db = await openDB();
+                const db = await openDB('AudioBookDB_Files');
                 const tx = db.transaction('audioBlobs', 'readonly');
                 const store = tx.objectStore('audioBlobs');
                 const req = store.get(ep.fileId);
@@ -841,9 +1065,11 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh bố cục giao diện dạng "Nhích vị trí lên/xuống"
+        // Tùy chỉnh chọn và tinh chỉnh từng phần tử / cục giao diện
         let isCustomizing = false;
-        let moduleOffsets = JSON.parse(localStorage.getItem('playerModuleOffsets') || '{"moduleCoverTitle": 0, "moduleControls": 0}');
+        let selectedElementId = null;
+        let elementConfigs = JSON.parse(localStorage.getItem('playerElementConfigs') || '{}');
+        // Cấu trúc config: { id: { y: 0, scale: 1 } }
 
         function toggleLayoutCustomizer() {
             isCustomizing = !isCustomizing;
@@ -852,33 +1078,76 @@
             if (isCustomizing) {
                 document.body.classList.add('customizing-layout');
                 btn.classList.add('active-custom');
-                showToast('Đang bật chế độ chỉnh sửa. Dùng nút Lên/Xuống để nhích vị trí ô!');
+                showToast('Đang bật chế độ chỉnh sửa. Bấm vào khoảng trống hoặc thành phần bất kỳ để tùy chỉnh!');
+                setupElementClickListeners();
             } else {
                 document.body.classList.remove('customizing-layout');
                 btn.classList.remove('active-custom');
-                showToast('Đã lưu vị trí bố cục mới!');
+                clearElementSelection();
+                showToast('Đã lưu tùy chỉnh giao diện thành công!');
             }
         }
 
-        function nudgeModule(moduleId, delta) {
-            if (moduleOffsets[moduleId] === undefined) moduleOffsets[moduleId] = 0;
-            moduleOffsets[moduleId] += delta;
-            localStorage.setItem('playerModuleOffsets', JSON.stringify(moduleOffsets));
-            applyModuleOffsets();
-            showToast(`Đã nhích vị trí ${delta < 0 ? 'lên' : 'xuống'}!`);
+        function setupElementClickListeners() {
+            // Các module lớn và phần tử con
+            const elements = document.querySelectorAll('.player-module, #subElementCover, #subElementControls, #subElementFeatures');
+            elements.forEach(el => {
+                el.onclick = (e) => {
+                    if (!isCustomizing) return;
+                    e.stopPropagation();
+                    selectElement(el);
+                };
+            });
         }
 
-        function applyModuleOffsets() {
-            for (const id in moduleOffsets) {
+        function selectElement(el) {
+            clearElementSelection();
+            selectedElementId = el.id;
+            el.classList.add(el.classList.contains('player-module') ? 'selected-element' : 'selected-sub-element');
+            const name = el.getAttribute('data-name') || 'Phần tử';
+            document.getElementById('selectedElementName').textContent = name;
+        }
+
+        function clearElementSelection() {
+            document.querySelectorAll('.selected-element, .selected-sub-element').forEach(el => {
+                el.classList.remove('selected-element', 'selected-sub-element');
+            });
+            selectedElementId = null;
+            document.getElementById('selectedElementName').textContent = 'Chưa chọn ô';
+        }
+
+        function adjustSelectedElement(action) {
+            if (!selectedElementId) {
+                showToast('Vui lòng chạm chọn một ô hoặc phần tử trước!');
+                return;
+            }
+
+            if (!elementConfigs[selectedElementId]) {
+                elementConfigs[selectedElementId] = { y: 0, scale: 1 };
+            }
+
+            const cfg = elementConfigs[selectedElementId];
+            if (action === 'up') cfg.y -= 8;
+            if (action === 'down') cfg.y += 8;
+            if (action === 'zoomIn') cfg.scale = Math.min(cfg.scale + 0.05, 1.4);
+            if (action === 'zoomOut') cfg.scale = Math.max(cfg.scale - 0.05, 0.7);
+
+            localStorage.setItem('playerElementConfigs', JSON.stringify(elementConfigs));
+            applyElementTransforms();
+        }
+
+        function applyElementTransforms() {
+            for (const id in elementConfigs) {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.style.transform = `translateY(${moduleOffsets[id]}px)`;
+                    const cfg = elementConfigs[id];
+                    el.style.transform = `translateY(${cfg.y}px) scale(${cfg.scale})`;
                 }
             }
         }
 
-        function loadModuleOffsets() {
-            applyModuleOffsets();
+        function loadElementTransforms() {
+            applyElementTransforms();
         }
 
         function closeAllModals() {
