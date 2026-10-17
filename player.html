@@ -506,8 +506,8 @@
             <h3 class="sheet-title">Cài Đặt Nhạc Nền</h3>
             <button class="close-btn" onclick="closeAllModals()">&times;</button>
         </div>
-        <button class="sheet-option-btn" onclick="openBgMusicAddSheet()">➕ Thêm nhạc nền mới</button>
-        <button class="sheet-option-btn" onclick="openBgMusicListSheet()">📜 Danh sách nhạc đã thêm</button>
+        <button class="sheet-option-btn" onclick="openBgMusicAddSheet()">Thêm nhạc nền mới</button>
+        <button class="sheet-option-btn" onclick="openBgMusicListSheet()">Danh sách nhạc đã thêm</button>
     </div>
 
     <!-- 2. BẢNG THÊM NHẠC NỀN -->
@@ -528,12 +528,12 @@
         <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
     </div>
 
-    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Thiết kế hiện đại, nút Lưu & Xóa dạng chữ) -->
+    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Giao diện hiện đại, tối giản thuần văn bản, không dùng icon) -->
     <div class="bottom-sheet" id="bgMusicListSheet">
         <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px;" onclick="saveAndCloseBgMusic()">💾 Lưu</button>
+            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px;" onclick="saveAndCloseBgMusic()">Lưu cài đặt</button>
             <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
-            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" onclick="deleteSelectedBgTrack()">Xóa nhạc chọn</button>
+            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" onclick="deleteSelectedBgTrack()">Xóa nhạc đang chọn</button>
         </div>
 
         <div class="form-group" style="margin-top: 12px;">
@@ -546,7 +546,7 @@
                 <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromSlider(this.value)" style="margin-bottom: 0;">
                 <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px;" oninput="updateBgVolumeFromNumber(this.value)">
             </div>
-            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử nhạc nền</button>
+            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">Nghe thử / Dừng nhạc nền</button>
         </div>
 
         <button class="submit-btn" onclick="saveAndCloseBgMusic()">Xong</button>
@@ -627,13 +627,13 @@
             localStorage.setItem('appTheme', isLight ? 'light' : 'dark');
             document.getElementById('themeIconMoon').style.display = isLight ? 'none' : 'block';
             document.getElementById('themeIconSun').style.display = isLight ? 'block' : 'none';
-            showToast(isLight ? 'Chế độ Ban Ngày ☀️' : 'Chế độ Ban Đêm 🌙');
+            showToast(isLight ? 'Chế độ Ban Ngày' : 'Chế độ Ban Đêm');
         }
 
         function changeThemeStyle(style) {
             localStorage.setItem('appThemeStyle', style);
             applyThemeStyle(style);
-            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? 'Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
+            showToast(`Đã đổi phong cách giao diện`);
         }
 
         function applyThemeStyle(style) {
@@ -718,10 +718,12 @@
                 }
             });
 
+            // Khi audio chính phát, đồng thời phát nhạc nền song song
             audioElement.addEventListener('play', () => {
                 playActiveBgMusic();
             });
 
+            // Khi audio chính tạm dừng, nhạc nền cũng tạm dừng
             audioElement.addEventListener('pause', () => {
                 bgAudioElement.pause();
             });
@@ -742,7 +744,7 @@
             });
         });
 
-        // Phát nhạc nền chuẩn xác qua IndexedDB
+        // Hàm phát nhạc nền độc lập song song qua IndexedDB
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -830,15 +832,15 @@
             const container = document.getElementById('bgMusicListContainer');
             let html = `
                 <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
-                    <span>🚫 Không có nhạc nền</span>
-                    <span>${!activeBgMusicId ? '✓' : ''}</span>
+                    <span>Không có nhạc nền</span>
+                    <span>${!activeBgMusicId ? 'Đang chọn' : ''}</span>
                 </div>
             `;
 
             html += bgMusicList.map(item => `
                 <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}" onclick="selectBgMusic('${item.id}')">
-                    <span>🎵 ${escapeHtml(item.name)}</span>
-                    <span>${activeBgMusicId === item.id ? '✓ Đang chọn' : ''}</span>
+                    <span>${escapeHtml(item.name)}</span>
+                    <span>${activeBgMusicId === item.id ? 'Đang chọn' : ''}</span>
                 </div>
             `).join('');
 
@@ -896,10 +898,10 @@
             }
             if (bgAudioElement.paused) {
                 playActiveBgMusic();
-                document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng nghe thử';
+                document.getElementById('bgPreviewBtn').textContent = 'Dừng nghe thử nhạc nền';
             } else {
                 bgAudioElement.pause();
-                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử nhạc nền';
+                document.getElementById('bgPreviewBtn').textContent = 'Nghe thử / Dừng nhạc nền';
             }
         }
 
