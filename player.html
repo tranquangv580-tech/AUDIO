@@ -371,6 +371,8 @@
             display: flex; justify-content: space-between; align-items: center; color: var(--text-primary);
         }
         .episode-list-item.playing { border-color: var(--accent); color: var(--accent); background: var(--card-hover); }
+        .episode-list-item.selectable-delete { border-style: dashed; }
+        .episode-list-item.to-delete { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
 
         #toast-container {
             position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
@@ -528,12 +530,11 @@
         <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
     </div>
 
-    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Giao diện hiện đại, tối giản thuần văn bản, không dùng icon) -->
+    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Giao diện chuẩn: nút Xóa phong cách Detail, nút Nghe thử nằm bên trái thanh trượt) -->
     <div class="bottom-sheet" id="bgMusicListSheet">
         <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px;" onclick="saveAndCloseBgMusic()">Lưu cài đặt</button>
             <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
-            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" onclick="deleteSelectedBgTrack()">Xóa nhạc đang chọn</button>
+            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" id="toggleDeleteModeBtn" onclick="toggleDeleteMode()">Xóa</button>
         </div>
 
         <div class="form-group" style="margin-top: 12px;">
@@ -542,14 +543,14 @@
 
         <div class="form-group" style="border-top: 1px solid var(--card-border); padding-top: 12px;">
             <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+                <button class="submit-btn" style="margin-top: 0; width: auto; padding: 8px 14px; font-size: 12px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent); white-space: nowrap;" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">Nghe thử</button>
                 <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromSlider(this.value)" style="margin-bottom: 0;">
-                <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px;" oninput="updateBgVolumeFromNumber(this.value)">
+                <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px; flex-shrink: 0;" oninput="updateBgVolumeFromNumber(this.value)">
             </div>
-            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">Nghe thử / Dừng nhạc nền</button>
         </div>
 
-        <button class="submit-btn" onclick="saveAndCloseBgMusic()">Xong</button>
+        <button class="submit-btn" onclick="closeAllModals()">Xong</button>
     </div>
 
     <!-- Modal Tốc Độ -->
@@ -689,6 +690,8 @@
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
         let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5'); // Mặc định 50%
+        let isDeleteMode = false;
+        let selectedIdsToDelete = new Set();
 
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
@@ -718,12 +721,10 @@
                 }
             });
 
-            // Khi audio chính phát, đồng thời phát nhạc nền song song
             audioElement.addEventListener('play', () => {
                 playActiveBgMusic();
             });
 
-            // Khi audio chính tạm dừng, nhạc nền cũng tạm dừng
             audioElement.addEventListener('pause', () => {
                 bgAudioElement.pause();
             });
@@ -744,7 +745,6 @@
             });
         });
 
-        // Hàm phát nhạc nền độc lập song song qua IndexedDB
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -786,6 +786,8 @@
 
         function openBgMusicListSheet() {
             closeAllModals();
+            isDeleteMode = false;
+            selectedIdsToDelete.clear();
             renderBgMusicList();
             document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('bgMusicListSheet').classList.add('active');
@@ -828,23 +830,76 @@
             }
         }
 
+        function toggleDeleteMode() {
+            isDeleteMode = !isDeleteMode;
+            const btn = document.getElementById('toggleDeleteModeBtn');
+            if (isDeleteMode) {
+                btn.textContent = 'Xác nhận xóa';
+                btn.style.background = 'var(--accent)';
+                btn.style.color = '#fff';
+                showToast('Chọn bài nhạc muốn xóa, sau đó nhấn xác nhận');
+            } else {
+                if (selectedIdsToDelete.size > 0) {
+                    bgMusicList = bgMusicList.filter(t => !selectedIdsToDelete.has(t.id));
+                    localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
+                    if (selectedIdsToDelete.has(activeBgMusicId)) {
+                        activeBgMusicId = '';
+                        localStorage.setItem('activeBgMusicId', '');
+                        bgAudioElement.pause();
+                    }
+                    selectedIdsToDelete.clear();
+                    showToast('Đã xóa các bản nhạc đã chọn!');
+                }
+                btn.textContent = 'Xóa';
+                btn.style.background = 'rgba(244,63,94,0.2)';
+                btn.style.color = 'var(--accent)';
+            }
+            renderBgMusicList();
+        }
+
         function renderBgMusicList() {
             const container = document.getElementById('bgMusicListContainer');
             let html = `
-                <div class="episode-list-item ${!activeBgMusicId ? 'playing' : ''}" onclick="selectBgMusic('')">
+                <div class="episode-list-item ${!activeBgMusicId && !isDeleteMode ? 'playing' : ''}" onclick="handleTrackClick('', false)">
                     <span>Không có nhạc nền</span>
-                    <span>${!activeBgMusicId ? 'Đang chọn' : ''}</span>
+                    <span>${!activeBgMusicId && !isDeleteMode ? 'Đang chọn' : ''}</span>
                 </div>
             `;
 
-            html += bgMusicList.map(item => `
-                <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}" onclick="selectBgMusic('${item.id}')">
-                    <span>${escapeHtml(item.name)}</span>
-                    <span>${activeBgMusicId === item.id ? 'Đang chọn' : ''}</span>
-                </div>
-            `).join('');
+            html += bgMusicList.map(item => {
+                const isSelectedForDelete = selectedIdsToDelete.has(item.id);
+                const isActive = activeBgMusicId === item.id;
+                let className = 'episode-list-item';
+                if (isDeleteMode) {
+                    className += ' selectable-delete';
+                    if (isSelectedForDelete) className += ' to-delete';
+                } else if (isActive) {
+                    className += ' playing';
+                }
+
+                return `
+                    <div class="${className}" onclick="handleTrackClick('${item.id}', ${isDeleteMode})">
+                        <span>${escapeHtml(item.name)}</span>
+                        <span>${isDeleteMode ? (isSelectedForDelete ? '✓ Xóa' : 'Chọn') : (isActive ? 'Đang chọn' : '')}</span>
+                    </div>
+                `;
+            }).join('');
 
             container.innerHTML = html;
+        }
+
+        function handleTrackClick(id, deleteMode) {
+            if (deleteMode) {
+                if (!id) return; // Không xóa mục "Không có nhạc nền"
+                if (selectedIdsToDelete.has(id)) {
+                    selectedIdsToDelete.delete(id);
+                } else {
+                    selectedIdsToDelete.add(id);
+                }
+                renderBgMusicList();
+            } else {
+                selectBgMusic(id);
+            }
         }
 
         function selectBgMusic(id) {
@@ -856,20 +911,7 @@
             } else {
                 bgAudioElement.pause();
             }
-        }
-
-        function deleteSelectedBgTrack() {
-            if (!activeBgMusicId) {
-                showToast('Chưa chọn bản nhạc nào để xóa!');
-                return;
-            }
-            bgMusicList = bgMusicList.filter(t => t.id !== activeBgMusicId);
-            localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-            activeBgMusicId = '';
-            localStorage.setItem('activeBgMusicId', '');
-            bgAudioElement.pause();
-            renderBgMusicList();
-            showToast('Đã xóa nhạc nền!');
+            showToast(id ? 'Đã chọn nhạc nền' : 'Đã tắt nhạc nền');
         }
 
         function updateBgVolumeFromSlider(val) {
@@ -898,21 +940,11 @@
             }
             if (bgAudioElement.paused) {
                 playActiveBgMusic();
-                document.getElementById('bgPreviewBtn').textContent = 'Dừng nghe thử nhạc nền';
+                document.getElementById('bgPreviewBtn').textContent = 'Dừng';
             } else {
                 bgAudioElement.pause();
-                document.getElementById('bgPreviewBtn').textContent = 'Nghe thử / Dừng nhạc nền';
+                document.getElementById('bgPreviewBtn').textContent = 'Nghe thử';
             }
-        }
-
-        function saveAndCloseBgMusic() {
-            if (activeBgMusicId && !audioElement.paused) {
-                playActiveBgMusic();
-            } else {
-                bgAudioElement.pause();
-            }
-            closeAllModals();
-            showToast('Đã lưu cài đặt nhạc nền!');
         }
 
         function updateSliderFill(val) {
