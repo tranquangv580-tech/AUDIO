@@ -197,7 +197,7 @@
             border-radius: 12px;
         }
 
-        /* KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI (Không đẩy vùng khác) */
+        /* KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI */
         .floating-alerts-container {
             position: fixed;
             top: 76px;
@@ -528,16 +528,16 @@
         <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
     </div>
 
-    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM -->
+    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Thiết kế hiện đại, nút Lưu & Xóa dạng chữ) -->
     <div class="bottom-sheet" id="bgMusicListSheet">
         <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <button class="icon-btn" onclick="saveAndCloseBgMusic()" title="Lưu">💾</button>
+            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px;" onclick="saveAndCloseBgMusic()">💾 Lưu</button>
             <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
-            <button class="icon-btn" style="color: var(--accent); border-color: var(--accent);" onclick="deleteSelectedBgTrack()" title="Xóa nhạc đang chọn">🗑️</button>
+            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" onclick="deleteSelectedBgTrack()">Xóa nhạc chọn</button>
         </div>
 
-        <div class="form-group" style="margin-top: 10px;">
-            <div id="bgMusicListContainer" style="max-height: 35vh; overflow-y: auto;"></div>
+        <div class="form-group" style="margin-top: 12px;">
+            <div id="bgMusicListContainer" style="max-height: 32vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
         <div class="form-group" style="border-top: 1px solid var(--card-border); padding-top: 12px;">
@@ -546,7 +546,7 @@
                 <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromSlider(this.value)" style="margin-bottom: 0;">
                 <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px;" oninput="updateBgVolumeFromNumber(this.value)">
             </div>
-            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử</button>
+            <button class="submit-btn" style="background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">▶ Nghe thử nhạc nền</button>
         </div>
 
         <button class="submit-btn" onclick="saveAndCloseBgMusic()">Xong</button>
@@ -633,7 +633,7 @@
         function changeThemeStyle(style) {
             localStorage.setItem('appThemeStyle', style);
             applyThemeStyle(style);
-            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? ' Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
+            showToast(`Đã đổi phong cách: ${style === 'nebula' ? 'Tinh vân 🌌' : style === 'ocean' ? 'Đại dương đêm 🌊' : 'Cơ bản ✨'}`);
         }
 
         function applyThemeStyle(style) {
@@ -742,7 +742,7 @@
             });
         });
 
-        // Phát nhạc nền đồng bộ
+        // Phát nhạc nền chuẩn xác qua IndexedDB
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -770,7 +770,6 @@
             }
         }
 
-        // Quy trình mở nhạc nền 2 lựa chọn
         function openBgMusicMenuModal() {
             closeAllModals();
             document.getElementById('modalOverlay').classList.add('active');
@@ -810,7 +809,7 @@
                 store.put(file, fileId);
 
                 tx.oncomplete = () => {
-                    bgMusicList.push({ id: fileId, name: musicName });
+                    bgMusicList.push({ id: fileId, name: musicName, fileId: fileId });
                     localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
                     if (!activeBgMusicId) {
                         activeBgMusicId = fileId;
@@ -838,7 +837,7 @@
 
             html += bgMusicList.map(item => `
                 <div class="episode-list-item ${activeBgMusicId === item.id ? 'playing' : ''}" onclick="selectBgMusic('${item.id}')">
-                    <span>${escapeHtml(item.name)}</span>
+                    <span>🎵 ${escapeHtml(item.name)}</span>
                     <span>${activeBgMusicId === item.id ? '✓ Đang chọn' : ''}</span>
                 </div>
             `).join('');
@@ -850,6 +849,11 @@
             activeBgMusicId = id;
             localStorage.setItem('activeBgMusicId', id);
             renderBgMusicList();
+            if (id) {
+                playActiveBgMusic();
+            } else {
+                bgAudioElement.pause();
+            }
         }
 
         function deleteSelectedBgTrack() {
@@ -885,7 +889,6 @@
             document.getElementById('bgVolumeVal').textContent = num;
         }
 
-        let isPreviewingBg = false;
         function toggleBgMusicPreview() {
             if (!activeBgMusicId) {
                 showToast('Vui lòng chọn một bài nhạc nền trước!');
@@ -893,12 +896,10 @@
             }
             if (bgAudioElement.paused) {
                 playActiveBgMusic();
-                isPreviewingBg = true;
                 document.getElementById('bgPreviewBtn').textContent = '⏹ Dừng nghe thử';
             } else {
                 bgAudioElement.pause();
-                isPreviewingBg = false;
-                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử';
+                document.getElementById('bgPreviewBtn').textContent = '▶ Nghe thử nhạc nền';
             }
         }
 
