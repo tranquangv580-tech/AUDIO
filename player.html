@@ -694,7 +694,7 @@
 
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
-        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5'); // Mặc định 50%
+        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
         let isDeleteMode = false;
         let selectedIdsToDelete = new Set();
 
@@ -712,6 +712,7 @@
 
             loadStoryAndPlay();
 
+            // Đồng bộ trạng thái hiển thị tiến trình và Media Session Position State trên iOS
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isUserSeeking) {
                     const slider = document.getElementById('progressSlider');
@@ -722,6 +723,17 @@
                     document.getElementById('durationText').textContent = formatTime(audioElement.duration);
 
                     savePlaybackHistory(audioElement.currentTime);
+
+                    // Cập nhật vị trí tiến trình chính xác cho trình phát iOS (Lock Screen)
+                    if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+                        try {
+                            navigator.mediaSession.setPositionState({
+                                duration: audioElement.duration,
+                                playbackRate: audioElement.playbackRate,
+                                position: audioElement.currentTime
+                            });
+                        } catch (e) {}
+                    }
                 }
             });
 
@@ -729,12 +741,18 @@
                 playActiveBgMusic();
                 document.getElementById('playIcon').style.display = 'none';
                 document.getElementById('pauseIcon').style.display = 'block';
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
             });
 
             audioElement.addEventListener('pause', () => {
                 bgAudioElement.pause();
                 document.getElementById('playIcon').style.display = 'block';
                 document.getElementById('pauseIcon').style.display = 'none';
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'paused';
+                }
             });
 
             audioElement.addEventListener('ended', () => {
@@ -749,6 +767,18 @@
                     document.getElementById('playIcon').style.display = 'block';
                     document.getElementById('pauseIcon').style.display = 'none';
                     showToast('Đã phát hết danh sách!');
+                }
+            });
+
+            // Duy trì phát nhạc nền và audio khi chuyển đổi tab / thu nhỏ ứng dụng trên iOS
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    if (!audioElement.paused && bgAudioElement.paused && activeBgMusicId) {
+                        bgAudioElement.play().catch(e => {});
+                    }
                 }
             });
         });
@@ -1049,7 +1079,7 @@
 
             document.getElementById('playerEpisodeTitle').textContent = ep.name;
 
-            // Cập nhật Media Session API để iOS hiển thị thông tin và nhận lệnh đồng bộ từ màn hình khóa
+            // Đăng ký Media Session API trỏ hoàn toàn vào tập audio chính của tiểu thuyết
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: ep.name,
@@ -1074,6 +1104,12 @@
 
                 navigator.mediaSession.setActionHandler('seekforward', function(details) {
                     skipTime(10);
+                });
+
+                navigator.mediaSession.setActionHandler('seekto', function(details) {
+                    if (details.seekTime !== undefined && audioElement.duration) {
+                        audioElement.currentTime = details.seekTime;
+                    }
                 });
             }
 
@@ -1299,7 +1335,7 @@
         }
 
         function adjustSelectedElement(action) {
-            if (!selectedElementId) {
+            if (!selectedEntityId = selectedElementId) {
                 showToast('Vui lòng chọn một ô trước!');
                 return;
             }
