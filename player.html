@@ -727,10 +727,14 @@
 
             audioElement.addEventListener('play', () => {
                 playActiveBgMusic();
+                document.getElementById('playIcon').style.display = 'none';
+                document.getElementById('pauseIcon').style.display = 'block';
             });
 
             audioElement.addEventListener('pause', () => {
                 bgAudioElement.pause();
+                document.getElementById('playIcon').style.display = 'block';
+                document.getElementById('pauseIcon').style.display = 'none';
             });
 
             audioElement.addEventListener('ended', () => {
@@ -804,7 +808,7 @@
 
         function applyBgVolumeDirect(vol) {
             bgMusicVolume = vol;
-            bgAudioElement.volume = vol; // fallback chuẩn HTML5
+            bgAudioElement.volume = vol;
             if (bgGainNode && audioCtx) {
                 bgGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
             }
@@ -1045,7 +1049,7 @@
 
             document.getElementById('playerEpisodeTitle').textContent = ep.name;
 
-            // Cập nhật Media Session API để iPhone hiển thị đúng thông tin tập audio chính trên màn hình khóa
+            // Cập nhật Media Session API để iOS hiển thị thông tin và nhận lệnh đồng bộ từ màn hình khóa
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: ep.name,
@@ -1054,6 +1058,22 @@
                     artwork: [
                         { src: currentStory.cover || 'https://placehold.co/512x512/1e293b/cbd5e1?text=AudioBook', sizes: '512x512', type: 'image/jpeg' }
                     ]
+                });
+
+                navigator.mediaSession.setActionHandler('play', function() {
+                    audioElement.play();
+                });
+
+                navigator.mediaSession.setActionHandler('pause', function() {
+                    audioElement.pause();
+                });
+
+                navigator.mediaSession.setActionHandler('seekbackward', function(details) {
+                    skipTime(-10);
+                });
+
+                navigator.mediaSession.setActionHandler('seekforward', function(details) {
+                    skipTime(10);
                 });
             }
 
@@ -1084,10 +1104,7 @@
                         }
                     };
 
-                    audioElement.play().then(() => {
-                        document.getElementById('playIcon').style.display = 'none';
-                        document.getElementById('pauseIcon').style.display = 'block';
-                    }).catch(err => {
+                    audioElement.play().catch(err => {
                         console.error('Autoplay bị chặn:', err);
                         showToast('Bấm nút Play để phát.');
                     });
@@ -1123,12 +1140,8 @@
         function togglePlayPause() {
             if (audioElement.paused) {
                 audioElement.play();
-                document.getElementById('playIcon').style.display = 'none';
-                document.getElementById('pauseIcon').style.display = 'block';
             } else {
                 audioElement.pause();
-                document.getElementById('playIcon').style.display = 'block';
-                document.getElementById('pauseIcon').style.display = 'none';
             }
         }
 
@@ -1182,8 +1195,6 @@
                 if (sleepTimerRemainingSeconds <= 0) {
                     clearInterval(sleepTimerInterval);
                     audioElement.pause();
-                    document.getElementById('playIcon').style.display = 'block';
-                    document.getElementById('pauseIcon').style.display = 'none';
                     document.getElementById('sleepTimerBadge').style.display = 'none';
                     showToast('Đã hẹn giờ tắt audio thành công!');
                 }
