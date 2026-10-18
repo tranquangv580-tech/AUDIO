@@ -530,7 +530,7 @@
         <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
     </div>
 
-    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM (Giao diện chuẩn: nút Xóa phong cách Detail, nút Nghe thử nằm bên trái thanh trượt) -->
+    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM -->
     <div class="bottom-sheet" id="bgMusicListSheet">
         <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
@@ -680,13 +680,18 @@
         let bgAudioElement = new Audio();
         bgAudioElement.loop = true;
 
+        // Web Audio API để điều chỉnh biên độ (Gain) chính xác cho nhạc nền
+        let audioCtx = null;
+        let bgSourceNode = null;
+        let bgGainNode = null;
+        let isWebAudioInitialized = false;
+
         let currentPlaybackSpeed = parseFloat(localStorage.getItem('globalAudioSpeed') || '1.0');
         let sleepTimerInterval = null;
         let sleepTimerRemainingSeconds = 0;
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
 
-        // Quản lý Nhạc nền
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
         let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5'); // Mặc định 50%
@@ -697,7 +702,6 @@
             initTheme();
             loadElementTransforms();
 
-            bgAudioElement.volume = bgMusicVolume;
             const volPct = Math.round(bgMusicVolume * 100);
             document.getElementById('bgVolumeRange').value = volPct;
             document.getElementById('bgVolumeNumberInput').value = volPct;
@@ -745,6 +749,25 @@
             });
         });
 
+        function initWebAudioIfNeeded() {
+            if (isWebAudioInitialized) return;
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                    bgGainNode = audioCtx.createGain();
+                    bgGainNode.gain.setValueAtTime(bgMusicVolume, audioCtx.currentTime);
+                    
+                    bgSourceNode = audioCtx.createMediaElementSource(bgAudioElement);
+                    bgSourceNode.connect(bgGainNode);
+                    bgGainNode.connect(audioCtx.destination);
+                    isWebAudioInitialized = true;
+                }
+            } catch (e) {
+                console.log('WebAudio init fallback:', e);
+            }
+        }
+
         async function playActiveBgMusic() {
             if (!activeBgMusicId) return;
             const track = bgMusicList.find(t => t.id === activeBgMusicId);
@@ -763,12 +786,27 @@
                         if (bgAudioElement.src !== url) {
                             bgAudioElement.src = url;
                         }
-                        bgAudioElement.volume = bgMusicVolume;
-                        bgAudioElement.play().catch(err => console.log('BgMusic play prevented:', err));
+                        
+                        if (audioCtx && audioCtx.state === 'suspended') {
+                            audioCtx.resume();
+                        }
+
+                        bgAudioElement.play().then(() => {
+                            initWebAudioIfNeeded();
+                            applyBgVolumeDirect(bgMusicVolume);
+                        }).catch(err => console.log('BgMusic play prevented:', err));
                     }
                 };
             } catch (err) {
                 console.error(err);
+            }
+        }
+
+        function applyBgVolumeDirect(vol) {
+            bgMusicVolume = vol;
+            bgAudioElement.volume = vol; // fallback chuẩn HTML5
+            if (bgGainNode && audioCtx) {
+                bgGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
             }
         }
 
@@ -890,7 +928,7 @@
 
         function handleTrackClick(id, deleteMode) {
             if (deleteMode) {
-                if (!id) return; // Không xóa mục "Không có nhạc nền"
+                if (!id) return;
                 if (selectedIdsToDelete.has(id)) {
                     selectedIdsToDelete.delete(id);
                 } else {
@@ -915,9 +953,9 @@
         }
 
         function updateBgVolumeFromSlider(val) {
-            bgMusicVolume = val / 100;
-            bgAudioElement.volume = bgMusicVolume;
-            localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            const vol = val / 100;
+            applyBgVolumeDirect(vol);
+            localStorage.setItem('bgMusicVolume', vol);
             document.getElementById('bgVolumeNumberInput').value = val;
             document.getElementById('bgVolumeVal').textContent = val;
         }
@@ -926,9 +964,9 @@
             let num = parseInt(val, 10);
             if (isNaN(num)) num = 0;
             num = Math.min(Math.max(num, 0), 100);
-            bgMusicVolume = num / 100;
-            bgAudioElement.volume = bgMusicVolume;
-            localStorage.setItem('bgMusicVolume', bgMusicVolume);
+            const vol = num / 100;
+            applyBgVolumeDirect(vol);
+            localStorage.setItem('bgMusicVolume', vol);
             document.getElementById('bgVolumeRange').value = num;
             document.getElementById('bgVolumeVal').textContent = num;
         }
@@ -1006,6 +1044,18 @@
             if (!ep) return;
 
             document.getElementById('playerEpisodeTitle').textContent = ep.name;
+
+            // Cập nhật Media Session API để iPhone hiển thị đúng thông tin tập audio chính trên màn hình khóa
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: ep.name,
+                    artist: currentStory.name || 'Sách Nói',
+                    album: 'Thư Viện Sách Nói',
+                    artwork: [
+                        { src: currentStory.cover || 'https://placehold.co/512x512/1e293b/cbd5e1?text=AudioBook', sizes: '512x512', type: 'image/jpeg' }
+                    ]
+                });
+            }
 
             try {
                 const db = await openDB('AudioBookDB_Files');
