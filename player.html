@@ -676,10 +676,10 @@
         let currentEpisodeIndex = parseInt(localStorage.getItem('currentEpisodeIndex') || '0', 10);
         let currentStory = null;
 
-        // Chỉ giữ MỘT thẻ audio duy nhất dành riêng cho tập truyện
+        // Thẻ audio chính dành riêng cho tập truyện (được iOS MediaSession nhận diện 100%)
         let audioElement = new Audio();
 
-        // Web Audio API quản lý nhạc nền không dùng thẻ audio phụ, tránh xung đột MediaSession trên iOS
+        // Web Audio API chuyên dụng xử lý nhạc nền để chạy nền không bị tắt trên iOS
         let audioCtx = null;
         let bgGainNode = null;
         let bgAudioBuffer = null;
@@ -714,7 +714,7 @@
 
             loadStoryAndPlay();
 
-            // Cập nhật tiến trình & MediaSession chính xác tuyệt đối cho iOS Lock Screen
+            // Đồng bộ tiến trình và Media Session Position State tuyệt đối cho iOS Lock Screen
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isUserSeeking) {
                     const slider = document.getElementById('progressSlider');
@@ -777,7 +777,7 @@
                 }
             });
 
-            // Duy trì trạng thái chạy ngầm khi khóa màn hình hoặc chuyển tab trên iOS
+            // Duy trì đồng bộ khi chuyển tab / khóa màn hình trên iOS
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     if (audioCtx && audioCtx.state === 'suspended') {
