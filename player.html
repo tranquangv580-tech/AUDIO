@@ -712,6 +712,11 @@
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
 
+            // Tải trước buffer nhạc nền nếu đã được chọn từ trước
+            if (activeBgMusicId) {
+                loadBgMusicBufferToMemory(activeBgMusicId);
+            }
+
             loadStoryAndPlay();
 
             // Đồng bộ tiến trình và Media Session Position State tuyệt đối cho iOS Lock Screen
@@ -744,7 +749,7 @@
                     audioCtx.resume();
                 }
                 if (activeBgMusicId && !isBgPlaying) {
-                    loadAndPlayBgMusicBuffer();
+                    startBgMusicSourceNode();
                 }
                 document.getElementById('playIcon').style.display = 'none';
                 document.getElementById('pauseIcon').style.display = 'block';
@@ -777,14 +782,15 @@
                 }
             });
 
-            // Duy trì đồng bộ khi chuyển tab / khóa màn hình trên iOS
+            // Xử lý khi mở khóa màn hình hoặc quay lại trang web trên iOS
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
+                    initWebAudioIfNeeded();
                     if (audioCtx && audioCtx.state === 'suspended') {
                         audioCtx.resume();
                     }
-                    if (!audioElement.paused && activeBgMusicId && !isBgPlaying) {
-                        loadAndPlayBgMusicBuffer();
+                    if (!audioElement.paused && activeBgMusicId) {
+                        startBgMusicSourceNode();
                     }
                 }
             });
@@ -806,16 +812,14 @@
             }
         }
 
-        async function loadAndPlayBgMusicBuffer() {
-            if (!activeBgMusicId) {
+        async function loadBgMusicBufferToMemory(id) {
+            if (!id) {
+                bgAudioBuffer = null;
                 stopBgMusicBuffer();
                 return;
             }
-            const track = bgMusicList.find(t => t.id === activeBgMusicId);
-            if (!track) {
-                stopBgMusicBuffer();
-                return;
-            }
+            const track = bgMusicList.find(t => t.id === id);
+            if (!track) return;
 
             try {
                 const db = await openDB('AudioBookDB_BgMusic');
@@ -827,13 +831,12 @@
                     const blob = e.target.result;
                     if (blob) {
                         initWebAudioIfNeeded();
-                        if (audioCtx && audioCtx.state === 'suspended') {
-                            await audioCtx.resume();
-                        }
                         const arrayBuffer = await blob.arrayBuffer();
                         audioCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
                             bgAudioBuffer = decodedBuffer;
-                            startBgMusicSourceNode();
+                            if (!audioElement.paused) {
+                                startBgMusicSourceNode();
+                            }
                         }, (err) => {
                             console.error('Lỗi giải mã nhạc nền:', err);
                         });
@@ -850,6 +853,9 @@
 
             try {
                 initWebAudioIfNeeded();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 bgBufferSource = audioCtx.createBufferSource();
                 bgBufferSource.buffer = bgAudioBuffer;
                 bgBufferSource.loop = true;
@@ -923,8 +929,7 @@
                     bgMusicList.push({ id: fileId, name: musicName, fileId: fileId });
                     localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
                     if (!activeBgMusicId) {
-                        activeBgMusicId = fileId;
-                        localStorage.setItem('activeBgMusicId', fileId);
+                        selectBgMusic(fileId);
                     }
                     nameInput.value = '';
                     fileInput.value = '';
@@ -950,9 +955,7 @@
                     bgMusicList = bgMusicList.filter(t => !selectedIdsToDelete.has(t.id));
                     localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
                     if (selectedIdsToDelete.has(activeBgMusicId)) {
-                        activeBgMusicId = '';
-                        localStorage.setItem('activeBgMusicId', '');
-                        stopBgMusicBuffer();
+                        selectBgMusic('');
                     }
                     selectedIdsToDelete.clear();
                     showToast('Đã xóa các bản nhạc đã chọn!');
@@ -1012,15 +1015,8 @@
         function selectBgMusic(id) {
             activeBgMusicId = id;
             localStorage.setItem('activeBgMusicId', id);
-            bgAudioBuffer = null;
             renderBgMusicList();
-            if (id) {
-                if (!audioElement.paused) {
-                    loadAndPlayBgMusicBuffer();
-                }
-            } else {
-                stopBgMusicBuffer();
-            }
+            loadBgMusicBufferToMemory(id);
             showToast(id ? 'Đã chọn nhạc nền' : 'Đã tắt nhạc nền');
         }
 
@@ -1061,34 +1057,11 @@
                 showToast('Đã dừng nghe thử');
             } else {
                 if (!bgAudioBuffer) {
-                    loadBgMusicForPreviewAndPlay();
+                    loadBgMusicBufferToMemory(activeBgMusicId);
+                    setTimeout(() => playPreviewSourceInternal(), 300);
                 } else {
                     playPreviewSourceInternal();
                 }
-            }
-        }
-
-        async function loadBgMusicForPreviewAndPlay() {
-            const track = bgMusicList.find(t => t.id === activeBgMusicId);
-            if (!track) return;
-            try {
-                const db = await openDB('AudioBookDB_BgMusic');
-                const tx = db.transaction('audioBlobs', 'readonly');
-                const store = tx.objectStore('audioBlobs');
-                const req = store.get(track.fileId);
-
-                req.onsuccess = async function(e) {
-                    const blob = e.target.result;
-                    if (blob) {
-                        const arrayBuffer = await blob.arrayBuffer();
-                        audioCtx.decodeAudioData(arrayBuffer, (decoded) => {
-                            bgAudioBuffer = decoded;
-                            playPreviewSourceInternal();
-                        });
-                    }
-                };
-            } catch (err) {
-                console.error(err);
             }
         }
 
