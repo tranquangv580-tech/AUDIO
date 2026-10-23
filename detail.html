@@ -557,7 +557,7 @@
             <p class="story-author" id="storyAuthorText">---</p>
             <div class="story-meta-row">
                 <span class="badge" id="storyEpisodeCountBadge">0 tập audio</span>
-                <span class="badge badge-secondary">💾 Lưu trực tiếp IndexedDB</span>
+                <span class="badge badge-secondary">💾 Lưu trữ OPFS (Không giới hạn)</span>
             </div>
         </div>
     </div>
@@ -705,9 +705,6 @@
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
                         db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                     }
-                    if (!db.objectStoreNames.contains('audioBlobs')) {
-                        db.createObjectStore('audioBlobs');
-                    }
                 };
                 request.onsuccess = (e) => resolve(e.target.result);
                 request.onerror = (e) => reject(e.target.error);
@@ -745,6 +742,22 @@
                 req.onsuccess = () => resolve(true);
                 req.onerror = () => reject(req.error);
             });
+        }
+
+        // === HỆ THỐNG OPFS (Origin Private File System) CHO FILE ÂM THANH LỚN ===
+        async function saveFileToOPFS(file, fileId) {
+            const root = await navigator.storage.getDirectory();
+            const handle = await root.getFileHandle(fileId, { create: true });
+            const writable = await handle.createWritable();
+            await writable.write(file);
+            await writable.close();
+        }
+
+        async function deleteFileFromOPFS(fileId) {
+            try {
+                const root = await navigator.storage.getDirectory();
+                await root.removeEntry(fileId);
+            } catch (e) {}
         }
 
         function initTheme() {
@@ -946,16 +959,12 @@
             }
 
             try {
-                const db = await initDB();
-                const tx = db.transaction('audioBlobs', 'readwrite');
-                const store = tx.objectStore('audioBlobs');
-
-                selectedEpisodesSet.forEach(idx => {
+                for (const idx of selectedEpisodesSet) {
                     const ep = currentStory.episodes[idx];
                     if (ep && ep.fileId) {
-                        store.delete(ep.fileId);
+                        await deleteFileFromOPFS(ep.fileId);
                     }
-                });
+                }
 
                 currentStory.episodes = currentStory.episodes.filter((_, idx) => !selectedEpisodesSet.has(idx));
                 await saveStoryToDB(currentStory);
@@ -971,14 +980,10 @@
 
         async function executeDeleteStory() {
             try {
-                const db = await initDB();
-                const tx = db.transaction('audioBlobs', 'readwrite');
-                const store = tx.objectStore('audioBlobs');
-
                 if (currentStory.episodes) {
-                    currentStory.episodes.forEach(ep => {
-                        if (ep.fileId) store.delete(ep.fileId);
-                    });
+                    for (const ep of currentStory.episodes) {
+                        if (ep.fileId) await deleteFileFromOPFS(ep.fileId);
+                    }
                 }
 
                 await deleteStoryFromDB(currentStoryId);
@@ -1019,34 +1024,26 @@
             const fileId = 'file_' + Date.now();
 
             try {
-                const db = await initDB();
-                const tx = db.transaction('audioBlobs', 'readwrite');
-                const store = tx.objectStore('audioBlobs');
-                store.put(selectedAudioFile, fileId);
+                // Lưu file lớn bằng OPFS (không giới hạn bộ nhớ)
+                await saveFileToOPFS(selectedAudioFile, fileId);
 
-                tx.oncomplete = async function() {
-                    const newEpisode = {
-                        id: 'ep_' + Date.now(),
-                        name: name,
-                        date: new Date().toLocaleDateString('vi-VN'),
-                        fileId: fileId
-                    };
-
-                    if (!currentStory.episodes) currentStory.episodes = [];
-                    currentStory.episodes.push(newEpisode);
-
-                    await saveStoryToDB(currentStory);
-                    closeAllModals();
-                    await loadStoryDetails();
-                    showToast('Đã liên kết và lưu tệp audio từ máy thành công!');
+                const newEpisode = {
+                    id: 'ep_' + Date.now(),
+                    name: name,
+                    date: new Date().toLocaleDateString('vi-VN'),
+                    fileId: fileId
                 };
 
-                tx.onerror = function() {
-                    showToast('Lỗi lưu trữ tệp vào bộ nhớ thiết bị!');
-                };
+                if (!currentStory.episodes) currentStory.episodes = [];
+                currentStory.episodes.push(newEpisode);
+
+                await saveStoryToDB(currentStory);
+                closeAllModals();
+                await loadStoryDetails();
+                showToast('Đã lưu thành công tệp audio dung lượng lớn!');
             } catch (err) {
                 console.error(err);
-                showToast('Bộ nhớ thiết bị đã đầy hoặc lỗi kết nối file!');
+                showToast('Lỗi lưu trữ tệp vào bộ nhớ thiết bị!');
             }
         }
 
