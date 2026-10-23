@@ -627,6 +627,48 @@
     <div id="toast-container"></div>
 
     <script>
+        // === KHỞI TẠO CƠ SỞ DỮ LIỆU INDEXEDDB ===
+        const DB_NAME = 'AudioNovelDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'stories';
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function getAllStoriesFromDB() {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function saveStoryToDB(story) {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.put(story);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // === QUẢN LÝ GIAO DIỆN VÀ THEME ===
         function initTheme() {
             const savedTheme = localStorage.getItem('appTheme') || 'dark';
             if (savedTheme === 'light') {
@@ -650,31 +692,6 @@
             showToast(isLight ? 'Đã chuyển sang Chế độ Ban Ngày ☀️' : 'Đã chuyển sang Chế độ Ban Đêm 🌙');
         }
 
-        const STORAGE_KEY = 'audio_book_stories_v2';
-
-        function loadStoriesFromStorage() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                if (data) {
-                    return JSON.parse(data);
-                }
-            } catch (err) {
-                console.error('Error reading localStorage:', err);
-            }
-            return [];
-        }
-
-        function saveStoriesToStorage(stories) {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
-                return true;
-            } catch (err) {
-                console.error('Error saving to localStorage:', err);
-                showToast('Bộ nhớ trình duyệt đã đầy hoặc bị hạn chế!');
-                return false;
-            }
-        }
-
         let allStoriesCache = [];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -696,9 +713,9 @@
             }, 3000);
         }
 
-        function loadStories() {
+        async function loadStories() {
             try {
-                allStoriesCache = loadStoriesFromStorage();
+                allStoriesCache = await getAllStoriesFromDB();
                 renderStoryList(allStoriesCache);
             } catch (err) {
                 console.error(err);
@@ -716,11 +733,18 @@
             if (stories && stories.length > 0) {
                 container.innerHTML = stories.map(story => {
                     const audioCount = story.episodes ? story.episodes.length : 0;
-                    const coverImg = story.cover || 'https://placehold.co/150x220/1e293b/cbd5e1?text=No+Cover';
+                    
+                    // Tạo URL hiển thị ảnh từ Blob/File hoặc Link mặc định
+                    let coverUrl = 'https://placehold.co/150x220/1e293b/cbd5e1?text=No+Cover';
+                    if (story.coverBlob) {
+                        coverUrl = URL.createObjectURL(story.coverBlob);
+                    } else if (story.cover) {
+                        coverUrl = story.cover;
+                    }
                     
                     return `
                         <div class="book-card" onclick="goToDetail('${story.id}')">
-                            <img src="${coverImg}" alt="Bìa truyện" class="book-cover">
+                            <img src="${coverUrl}" alt="Bìa truyện" class="book-cover">
                             <div class="book-info">
                                 <h3 class="book-title">${escapeHtml(story.name || '')}</h3>
                                 <p class="book-author">${escapeHtml(story.author || 'Đang cập nhật')}</p>
@@ -772,13 +796,9 @@
                 return;
             }
 
-            let coverData = '';
+            let coverBlob = null;
             if (coverInput.files && coverInput.files[0]) {
-                try {
-                    coverData = await fileToBase64(coverInput.files[0]);
-                } catch (e) {
-                    console.error(e);
-                }
+                coverBlob = coverInput.files[0]; // Lưu trực tiếp File/Blob vào IndexedDB không giới hạn
             }
 
             const newStory = {
@@ -786,31 +806,23 @@
                 name: name,
                 author: author || 'Đang cập nhật',
                 summary: summary || 'Chưa có tóm tắt.',
-                cover: coverData,
+                coverBlob: coverBlob,
                 episodes: []
             };
 
-            let currentStories = loadStoriesFromStorage();
-            currentStories.unshift(newStory);
-            
-            if (saveStoriesToStorage(currentStories)) {
+            try {
+                await saveStoryToDB(newStory);
                 closeStoryModal();
-                loadStories();
+                await loadStories();
                 document.getElementById('newStoryName').value = '';
                 document.getElementById('newStoryAuthor').value = '';
                 document.getElementById('newStorySummary').value = '';
                 coverInput.value = '';
                 showToast('Đã thêm bộ tiểu thuyết mới thành công!');
+            } catch (err) {
+                console.error(err);
+                showToast('Không thể lưu tiểu thuyết vào bộ nhớ!');
             }
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
         }
 
         function escapeHtml(text) {
