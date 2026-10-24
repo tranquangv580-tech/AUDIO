@@ -103,7 +103,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hiệu ứng tinh vân vũ trụ u tối chi tiết */
         .nebula-decorations {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             pointer-events: none; z-index: -1; overflow: hidden; display: none;
@@ -151,7 +150,6 @@
             font-family: var(--font-main); outline: none; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
         }
 
-        /* Bảng điều khiển tinh chỉnh phần tử */
         .layout-control-panel {
             display: none;
             position: fixed;
@@ -165,7 +163,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             align-items: center;
             gap: 12px;
-            animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         body.customizing-layout .layout-control-panel { display: flex; }
         body.customizing-layout .style-select,
@@ -197,7 +194,6 @@
             border-radius: 12px;
         }
 
-        /* KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI */
         .floating-alerts-container {
             position: fixed;
             top: 76px;
@@ -228,7 +224,6 @@
         }
         .history-banner:hover { background: var(--card-hover); }
 
-        /* Khung chính điều khiển Flexbox */
         .player-container-flex { 
             display: flex; 
             flex-direction: column; 
@@ -263,7 +258,6 @@
             flex-shrink: 0;
         }
 
-        /* Thanh tiến trình */
         .progress-slider {
             width: 100%;
             -webkit-appearance: none;
@@ -371,8 +365,6 @@
             display: flex; justify-content: space-between; align-items: center; color: var(--text-primary);
         }
         .episode-list-item.playing { border-color: var(--accent); color: var(--accent); background: var(--card-hover); }
-        .episode-list-item.selectable-delete { border-style: dashed; }
-        .episode-list-item.to-delete { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
 
         #toast-container {
             position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
@@ -389,14 +381,12 @@
 </head>
 <body>
 
-    <!-- Hiệu ứng không gian tinh vân -->
     <div class="nebula-decorations">
         <div class="nebula-cloud-1"></div>
         <div class="nebula-cloud-2"></div>
         <div class="nebula-stars"></div>
     </div>
 
-    <!-- Bảng điều khiển tinh chỉnh phần tử -->
     <div class="layout-control-panel" id="layoutControlPanel">
         <span class="control-group-title" id="selectedElementName">Chưa chọn ô</span>
         <div style="display: flex; gap: 6px;">
@@ -413,11 +403,9 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <!-- Nút chức năng Nhạc Nền -->
             <button class="icon-btn" onclick="openBgMusicMenuModal()" title="Cài đặt nhạc nền">
                 <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
             </button>
-            <!-- Nút bật chế độ Cài đặt giao diện tinh chỉnh -->
             <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh phần tử giao diện">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
@@ -433,24 +421,19 @@
         </div>
     </div>
 
-    <!-- KHU VỰC THÔNG BÁO NỔI PHÍA BÊN PHẢI -->
     <div class="floating-alerts-container">
-        <!-- Khung đếm ngược hẹn giờ (Mặt đồng hồ nổi có thể di chuyển) -->
         <div class="sleep-timer-badge" id="sleepTimerBadge" draggable="true">
             <span>⏳ <span id="sleepCountdownText">0:00:00</span></span>
         </div>
 
-        <!-- Thông báo lịch sử nghe trước đó -->
         <div class="history-banner" id="historyBanner" onclick="jumpToHistoryTime()">
             <span id="historyBannerText">📜 Có lịch sử nghe!</span>
             <span style="color: var(--accent); font-weight: 850;">▶</span>
         </div>
     </div>
 
-    <!-- Khung chính -->
     <div class="player-container-flex" id="playerContainerFlex">
         
-        <!-- Module 1: Ảnh bìa & Tên -->
         <div class="player-top-section player-module" id="moduleCoverTitle" data-name="Khối Ảnh & Tên">
             <div class="player-cover-container" id="subElementCover" data-name="Ảnh bìa">
                 <img src="" alt="Ảnh bìa" class="player-cover" id="playerCoverImg">
@@ -459,7 +442,6 @@
             <p class="player-episode-title" id="playerEpisodeTitle">Đang tải tập...</p>
         </div>
 
-        <!-- Module 2: Điều khiển & Tiến trình -->
         <div class="player-bottom-section player-module" id="moduleControls" data-name="Khối Điều Khiển">
             <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0" step="0.1" oninput="onSliderInput(this.value)" onchange="onSliderChange(this.value)">
             
@@ -502,7 +484,6 @@
     <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-    <!-- 1. BẢNG MENU CHÍNH NHẠC NỀN (2 LỰA CHỌN) -->
     <div class="bottom-sheet" id="bgMusicMenuSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Cài Đặt Nhạc Nền</h3>
@@ -512,7 +493,6 @@
         <button class="sheet-option-btn" onclick="openBgMusicListSheet()">Danh sách nhạc đã thêm</button>
     </div>
 
-    <!-- 2. BẢNG THÊM NHẠC NỀN -->
     <div class="bottom-sheet" id="bgMusicAddSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Thêm Tệp Nhạc Nền (MP3)</h3>
@@ -530,30 +510,16 @@
         <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
     </div>
 
-    <!-- 3. BẢNG DANH SÁCH NHẠC ĐÃ THÊM -->
     <div class="bottom-sheet" id="bgMusicListSheet">
         <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
-            <button class="submit-btn" style="margin-top: 0; width: auto; padding: 6px 14px; font-size: 12px; background: rgba(244,63,94,0.2); color: var(--accent); border: 1px solid var(--accent);" id="toggleDeleteModeBtn" onclick="toggleDeleteMode()">Xóa</button>
         </div>
-
         <div class="form-group" style="margin-top: 12px;">
             <div id="bgMusicListContainer" style="max-height: 32vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
-
-        <div class="form-group" style="border-top: 1px solid var(--card-border); padding-top: 12px;">
-            <label class="form-label">Âm lượng nhạc nền (<span id="bgVolumeVal">50</span>%)</label>
-            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
-                <button class="submit-btn" style="margin-top: 0; width: auto; padding: 8px 14px; font-size: 12px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent); white-space: nowrap;" onclick="toggleBgMusicPreview()" id="bgPreviewBtn">Nghe thử</button>
-                <input type="range" min="0" max="100" value="50" class="progress-slider" id="bgVolumeRange" oninput="updateBgVolumeFromSlider(this.value)" style="margin-bottom: 0;">
-                <input type="number" min="0" max="100" value="50" class="form-input" id="bgVolumeNumberInput" style="width: 70px; text-align: center; padding: 8px; flex-shrink: 0;" oninput="updateBgVolumeFromNumber(this.value)">
-            </div>
-        </div>
-
         <button class="submit-btn" onclick="closeAllModals()">Xong</button>
     </div>
 
-    <!-- Modal Tốc Độ -->
     <div class="bottom-sheet" id="speedModalSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Tốc Độ Phát Audio</h3>
@@ -564,16 +530,8 @@
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(1.25)">1.25x - Hơi nhanh</button>
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(1.5)">1.5x - Nhanh</button>
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(2.0)">2.0x - Siêu tốc</button>
-        <div class="form-group" style="margin-top: 12px;">
-            <label class="form-label">Tốc độ tùy chỉnh (0.5 - 4.0)</label>
-            <div style="display: flex; gap: 8px;">
-                <input type="number" step="0.1" min="0.5" max="4.0" class="form-input" id="customSpeedInput" placeholder="Nhập tốc độ...">
-                <button class="submit-btn" style="margin-top: 0; width: 100px;" onclick="applyCustomSpeed()">Áp dụng</button>
-            </div>
-        </div>
     </div>
 
-    <!-- Modal Hẹn Giờ Tắt -->
     <div class="bottom-sheet" id="sleepTimerSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Hẹn Giờ Tắt Audio</h3>
@@ -583,17 +541,9 @@
         <button class="sheet-option-btn" onclick="startSleepTimer(15)">Sau 15 phút</button>
         <button class="sheet-option-btn" onclick="startSleepTimer(30)">Sau 30 phút</button>
         <button class="sheet-option-btn" onclick="startSleepTimer(60)">Sau 60 phút</button>
-        <div class="form-group" style="margin-top: 12px;">
-            <label class="form-label">Số phút tùy chỉnh</label>
-            <div style="display: flex; gap: 8px;">
-                <input type="number" min="1" class="form-input" id="customMinutesInput" placeholder="Số phút...">
-                <button class="submit-btn" style="margin-top: 0; width: 100px;" onclick="applyCustomSleepTimer()">Bắt đầu</button>
-            </div>
-        </div>
         <button class="submit-btn" style="background: rgba(244,63,94,0.2); color: var(--accent); margin-top: 10px;" onclick="cancelSleepTimer()">Hủy hẹn giờ</button>
     </div>
 
-    <!-- Modal Danh Sách Tập -->
     <div class="bottom-sheet" id="playlistSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Danh Sách Tập Audio</h3>
@@ -605,6 +555,61 @@
     <div id="toast-container"></div>
 
     <script>
+        const DB_NAME = 'AudioNovelDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'stories';
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('audioBlobs')) {
+                        db.createObjectStore('audioBlobs');
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function getStoryFromDB(storyId) {
+            const db = await initDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.get(storyId);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // Lấy tệp audio từ OPFS hoặc IndexedDB audioBlobs
+        async function getAudioBlob(fileId) {
+            try {
+                const root = await navigator.storage.getDirectory();
+                const handle = await root.getFileHandle(fileId);
+                const file = await handle.getFile();
+                if (file) return file;
+            } catch (e) {}
+
+            try {
+                const db = await initDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction('audioBlobs', 'readonly');
+                    const store = tx.objectStore('audioBlobs');
+                    const req = store.get(fileId);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
         function initTheme() {
             const savedTheme = localStorage.getItem('appTheme') || 'dark';
             const savedStyle = localStorage.getItem('appThemeStyle') || 'nebula';
@@ -659,32 +664,16 @@
             }, 3000);
         }
 
-        function openDB(dbName = 'AudioBookDB_Files') {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(dbName, 1);
-                request.onupgradeneeded = e => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('audioBlobs')) db.createObjectStore('audioBlobs');
-                };
-                request.onsuccess = e => resolve(e.target.result);
-                request.onerror = e => reject(e.target.error);
-            });
-        }
-
-        const STORIES_KEY = 'audio_book_stories_v2';
         let currentStoryId = localStorage.getItem('currentStoryId');
         let currentEpisodeIndex = parseInt(localStorage.getItem('currentEpisodeIndex') || '0', 10);
         let currentStory = null;
 
-        // Thẻ audio chính dành riêng cho tập truyện (được iOS MediaSession nhận diện 100%)
         let audioElement = new Audio();
 
-        // Web Audio API chuyên dụng xử lý nhạc nền để chạy nền không bị tắt trên iOS
         let audioCtx = null;
         let bgGainNode = null;
         let bgAudioBuffer = null;
         let bgBufferSource = null;
-        let previewBufferSource = null;
         let isWebAudioInitialized = false;
         let isBgPlaying = false;
 
@@ -697,29 +686,20 @@
         let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
         let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
         let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
-        let isDeleteMode = false;
-        let selectedIdsToDelete = new Set();
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             initTheme();
             loadElementTransforms();
-
-            const volPct = Math.round(bgMusicVolume * 100);
-            document.getElementById('bgVolumeRange').value = volPct;
-            document.getElementById('bgVolumeNumberInput').value = volPct;
-            document.getElementById('bgVolumeVal').textContent = volPct;
 
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
 
-            // Tải trước buffer nhạc nền nếu đã được chọn từ trước
             if (activeBgMusicId) {
                 loadBgMusicBufferToMemory(activeBgMusicId);
             }
 
-            loadStoryAndPlay();
+            await loadStoryAndPlay();
 
-            // Đồng bộ tiến trình và Media Session Position State tuyệt đối cho iOS Lock Screen
             audioElement.addEventListener('timeupdate', () => {
                 if (audioElement.duration && !isUserSeeking) {
                     const slider = document.getElementById('progressSlider');
@@ -781,19 +761,6 @@
                     showToast('Đã phát hết danh sách!');
                 }
             });
-
-            // Xử lý khi mở khóa màn hình hoặc quay lại trang web trên iOS
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    initWebAudioIfNeeded();
-                    if (audioCtx && audioCtx.state === 'suspended') {
-                        audioCtx.resume();
-                    }
-                    if (!audioElement.paused && activeBgMusicId) {
-                        startBgMusicSourceNode();
-                    }
-                }
-            });
         });
 
         function initWebAudioIfNeeded() {
@@ -807,9 +774,7 @@
                     bgGainNode.connect(audioCtx.destination);
                     isWebAudioInitialized = true;
                 }
-            } catch (e) {
-                console.log('WebAudio init error:', e);
-            }
+            } catch (e) {}
         }
 
         async function loadBgMusicBufferToMemory(id) {
@@ -820,262 +785,38 @@
             }
             const track = bgMusicList.find(t => t.id === id);
             if (!track) return;
-
-            try {
-                const db = await openDB('AudioBookDB_BgMusic');
-                const tx = db.transaction('audioBlobs', 'readonly');
-                const store = tx.objectStore('audioBlobs');
-                const req = store.get(track.fileId);
-
-                req.onsuccess = async function(e) {
-                    const blob = e.target.result;
-                    if (blob) {
-                        initWebAudioIfNeeded();
-                        const arrayBuffer = await blob.arrayBuffer();
-                        audioCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
-                            bgAudioBuffer = decodedBuffer;
-                            if (!audioElement.paused) {
-                                startBgMusicSourceNode();
-                            }
-                        }, (err) => {
-                            console.error('Lỗi giải mã nhạc nền:', err);
-                        });
-                    }
-                };
-            } catch (err) {
-                console.error(err);
+            const blob = await getAudioBlob(track.fileId);
+            if (blob) {
+                initWebAudioIfNeeded();
+                const arrayBuffer = await blob.arrayBuffer();
+                audioCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
+                    bgAudioBuffer = decodedBuffer;
+                    if (!audioElement.paused) startBgMusicSourceNode();
+                });
             }
         }
 
         function startBgMusicSourceNode() {
             stopBgMusicBuffer();
             if (!bgAudioBuffer || !activeBgMusicId || audioElement.paused) return;
-
             try {
                 initWebAudioIfNeeded();
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
                 bgBufferSource = audioCtx.createBufferSource();
                 bgBufferSource.buffer = bgAudioBuffer;
                 bgBufferSource.loop = true;
                 bgBufferSource.connect(bgGainNode);
                 bgBufferSource.start(0);
                 isBgPlaying = true;
-            } catch (e) {
-                console.log('Start bg source error:', e);
-            }
+            } catch (e) {}
         }
 
         function stopBgMusicBuffer() {
             if (bgBufferSource) {
-                try {
-                    bgBufferSource.stop();
-                    bgBufferSource.disconnect();
-                } catch (e) {}
+                try { bgBufferSource.stop(); bgBufferSource.disconnect(); } catch (e) {}
                 bgBufferSource = null;
             }
             isBgPlaying = false;
-        }
-
-        function applyBgVolumeDirect(vol) {
-            bgMusicVolume = vol;
-            if (bgGainNode && audioCtx) {
-                bgGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-            }
-        }
-
-        function openBgMusicMenuModal() {
-            closeAllModals();
-            document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('bgMusicMenuSheet').classList.add('active');
-        }
-
-        function openBgMusicAddSheet() {
-            closeAllModals();
-            document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('bgMusicAddSheet').classList.add('active');
-        }
-
-        function openBgMusicListSheet() {
-            closeAllModals();
-            isDeleteMode = false;
-            selectedIdsToDelete.clear();
-            renderBgMusicList();
-            document.getElementById('modalOverlay').classList.add('active');
-            document.getElementById('bgMusicListSheet').classList.add('active');
-        }
-
-        async function saveNewBgMusicTrack() {
-            const nameInput = document.getElementById('bgMusicNameInput');
-            const fileInput = document.getElementById('bgMusicFileInput');
-            const file = fileInput.files[0];
-
-            if (!file) {
-                showToast('Vui lòng chọn tệp MP3 nhạc nền!');
-                return;
-            }
-
-            const musicName = nameInput.value.trim() || file.name.replace(/\.[^/.]+$/, "");
-            const fileId = 'bg_' + Date.now();
-
-            try {
-                const db = await openDB('AudioBookDB_BgMusic');
-                const tx = db.transaction('audioBlobs', 'readwrite');
-                const store = tx.objectStore('audioBlobs');
-                store.put(file, fileId);
-
-                tx.oncomplete = () => {
-                    bgMusicList.push({ id: fileId, name: musicName, fileId: fileId });
-                    localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-                    if (!activeBgMusicId) {
-                        selectBgMusic(fileId);
-                    }
-                    nameInput.value = '';
-                    fileInput.value = '';
-                    showToast(`Đã thêm: ${musicName}`);
-                    openBgMusicListSheet();
-                };
-            } catch (err) {
-                console.error(err);
-                showToast('Lỗi lưu tệp nhạc nền!');
-            }
-        }
-
-        function toggleDeleteMode() {
-            isDeleteMode = !isDeleteMode;
-            const btn = document.getElementById('toggleDeleteModeBtn');
-            if (isDeleteMode) {
-                btn.textContent = 'Xác nhận xóa';
-                btn.style.background = 'var(--accent)';
-                btn.style.color = '#fff';
-                showToast('Chọn bài nhạc muốn xóa, sau đó nhấn xác nhận');
-            } else {
-                if (selectedIdsToDelete.size > 0) {
-                    bgMusicList = bgMusicList.filter(t => !selectedIdsToDelete.has(t.id));
-                    localStorage.setItem('customBgMusicList', JSON.stringify(bgMusicList));
-                    if (selectedIdsToDelete.has(activeBgMusicId)) {
-                        selectBgMusic('');
-                    }
-                    selectedIdsToDelete.clear();
-                    showToast('Đã xóa các bản nhạc đã chọn!');
-                }
-                btn.textContent = 'Xóa';
-                btn.style.background = 'rgba(244,63,94,0.2)';
-                btn.style.color = 'var(--accent)';
-            }
-            renderBgMusicList();
-        }
-
-        function renderBgMusicList() {
-            const container = document.getElementById('bgMusicListContainer');
-            let html = `
-                <div class="episode-list-item ${!activeBgMusicId && !isDeleteMode ? 'playing' : ''}" onclick="handleTrackClick('', false)">
-                    <span>Không có nhạc nền</span>
-                    <span>${!activeBgMusicId && !isDeleteMode ? 'Đang chọn' : ''}</span>
-                </div>
-            `;
-
-            html += bgMusicList.map(item => {
-                const isSelectedForDelete = selectedIdsToDelete.has(item.id);
-                const isActive = activeBgMusicId === item.id;
-                let className = 'episode-list-item';
-                if (isDeleteMode) {
-                    className += ' selectable-delete';
-                    if (isSelectedForDelete) className += ' to-delete';
-                } else if (isActive) {
-                    className += ' playing';
-                }
-
-                return `
-                    <div class="${className}" onclick="handleTrackClick('${item.id}', ${isDeleteMode})">
-                        <span>${escapeHtml(item.name)}</span>
-                        <span>${isDeleteMode ? (isSelectedForDelete ? '✓ Xóa' : 'Chọn') : (isActive ? 'Đang chọn' : '')}</span>
-                    </div>
-                `;
-            }).join('');
-
-            container.innerHTML = html;
-        }
-
-        function handleTrackClick(id, deleteMode) {
-            if (deleteMode) {
-                if (!id) return;
-                if (selectedIdsToDelete.has(id)) {
-                    selectedIdsToDelete.delete(id);
-                } else {
-                    selectedIdsToDelete.add(id);
-                }
-                renderBgMusicList();
-            } else {
-                selectBgMusic(id);
-            }
-        }
-
-        function selectBgMusic(id) {
-            activeBgMusicId = id;
-            localStorage.setItem('activeBgMusicId', id);
-            renderBgMusicList();
-            loadBgMusicBufferToMemory(id);
-            showToast(id ? 'Đã chọn nhạc nền' : 'Đã tắt nhạc nền');
-        }
-
-        function updateBgVolumeFromSlider(val) {
-            const vol = val / 100;
-            applyBgVolumeDirect(vol);
-            localStorage.setItem('bgMusicVolume', vol);
-            document.getElementById('bgVolumeNumberInput').value = val;
-            document.getElementById('bgVolumeVal').textContent = val;
-        }
-
-        function updateBgVolumeFromNumber(val) {
-            let num = parseInt(val, 10);
-            if (isNaN(num)) num = 0;
-            num = Math.min(Math.max(num, 0), 100);
-            const vol = num / 100;
-            applyBgVolumeDirect(vol);
-            localStorage.setItem('bgMusicVolume', vol);
-            document.getElementById('bgVolumeRange').value = num;
-            document.getElementById('bgVolumeVal').textContent = num;
-        }
-
-        function toggleBgMusicPreview() {
-            if (!activeBgMusicId) {
-                showToast('Vui lòng chọn một bài nhạc nền trước!');
-                return;
-            }
-            initWebAudioIfNeeded();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
-            if (previewBufferSource) {
-                try {
-                    previewBufferSource.stop();
-                    previewBufferSource.disconnect();
-                } catch(e) {}
-                previewBufferSource = null;
-                document.getElementById('bgPreviewBtn').textContent = 'Nghe thử';
-                showToast('Đã dừng nghe thử');
-            } else {
-                if (!bgAudioBuffer) {
-                    loadBgMusicBufferToMemory(activeBgMusicId);
-                    setTimeout(() => playPreviewSourceInternal(), 300);
-                } else {
-                    playPreviewSourceInternal();
-                }
-            }
-        }
-
-        function playPreviewSourceInternal() {
-            if (!bgAudioBuffer) return;
-            try {
-                previewBufferSource = audioCtx.createBufferSource();
-                previewBufferSource.buffer = bgAudioBuffer;
-                previewBufferSource.loop = true;
-                previewBufferSource.connect(bgGainNode);
-                previewBufferSource.start(0);
-                document.getElementById('bgPreviewBtn').textContent = 'Dừng';
-                showToast('Đang phát nghe thử nhạc nền');
-            } catch (e) {}
         }
 
         function updateSliderFill(val) {
@@ -1096,40 +837,40 @@
 
         function onSliderChange(val) {
             if (audioElement.duration) {
-                const newTime = (val / 100) * audioElement.duration;
-                audioElement.currentTime = newTime;
+                audioElement.currentTime = (val / 100) * audioElement.duration;
             }
             isUserSeeking = false;
         }
 
-        function getStoriesFromStorage() {
-            try {
-                const data = localStorage.getItem(STORIES_KEY);
-                if (data) return JSON.parse(data);
-            } catch (e) {
-                console.error(e);
-            }
-            return [];
-        }
-
         async function loadStoryAndPlay() {
-            const stories = getStoriesFromStorage();
-            currentStory = stories.find(s => s.id === currentStoryId);
+            try {
+                currentStory = await getStoryFromDB(currentStoryId);
 
-            if (!currentStory || !currentStory.episodes || currentStory.episodes.length === 0) {
-                showToast('Không tìm thấy dữ liệu tập audio!');
-                setTimeout(() => window.location.href = 'detail.html', 1000);
-                return;
+                if (!currentStory || !currentStory.episodes || currentStory.episodes.length === 0) {
+                    showToast('Không tìm thấy dữ liệu tập audio!');
+                    setTimeout(() => window.location.href = 'detail.html', 1000);
+                    return;
+                }
+
+                document.getElementById('playerStoryTitle').textContent = currentStory.name || 'Tiểu thuyết';
+                
+                let coverUrl = 'https://placehold.co/150x220/1e293b/cbd5e1?text=No+Cover';
+                if (currentStory.coverBlob) {
+                    coverUrl = URL.createObjectURL(currentStory.coverBlob);
+                } else if (currentStory.cover) {
+                    coverUrl = currentStory.cover;
+                }
+                document.getElementById('playerCoverImg').src = coverUrl;
+
+                if (isNaN(currentEpisodeIndex) || currentEpisodeIndex >= currentStory.episodes.length) {
+                    currentEpisodeIndex = 0;
+                }
+
+                loadAndPlayCurrentEpisode();
+            } catch (err) {
+                console.error(err);
+                showToast('Lỗi tải thông tin tiểu thuyết!');
             }
-
-            document.getElementById('playerStoryTitle').textContent = currentStory.name || 'Tiểu thuyết';
-            document.getElementById('playerCoverImg').src = currentStory.cover || 'https://placehold.co/150x220/1e293b/cbd5e1?text=No+Cover';
-
-            if (isNaN(currentEpisodeIndex) || currentEpisodeIndex >= currentStory.episodes.length) {
-                currentEpisodeIndex = 0;
-            }
-
-            loadAndPlayCurrentEpisode();
         }
 
         async function loadAndPlayCurrentEpisode() {
@@ -1138,34 +879,21 @@
 
             document.getElementById('playerEpisodeTitle').textContent = ep.name;
 
-            // Đăng ký Media Session API duy nhất trỏ vào tập audio truyện
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: ep.name,
                     artist: currentStory.name || 'Sách Nói',
                     album: 'Thư Viện Sách Nói',
                     artwork: [
-                        { src: currentStory.cover || 'https://placehold.co/512x512/1e293b/cbd5e1?text=AudioBook', sizes: '512x512', type: 'image/jpeg' }
+                        { src: document.getElementById('playerCoverImg').src, sizes: '512x512', type: 'image/jpeg' }
                     ]
                 });
 
-                navigator.mediaSession.setActionHandler('play', function() {
-                    audioElement.play();
-                });
-
-                navigator.mediaSession.setActionHandler('pause', function() {
-                    audioElement.pause();
-                });
-
-                navigator.mediaSession.setActionHandler('seekbackward', function(details) {
-                    skipTime(-10);
-                });
-
-                navigator.mediaSession.setActionHandler('seekforward', function(details) {
-                    skipTime(10);
-                });
-
-                navigator.mediaSession.setActionHandler('seekto', function(details) {
+                navigator.mediaSession.setActionHandler('play', () => audioElement.play());
+                navigator.mediaSession.setActionHandler('pause', () => audioElement.pause());
+                navigator.mediaSession.setActionHandler('seekbackward', () => skipTime(-10));
+                navigator.mediaSession.setActionHandler('seekforward', () => skipTime(10));
+                navigator.mediaSession.setActionHandler('seekto', (details) => {
                     if (details.seekTime !== undefined && audioElement.duration) {
                         audioElement.currentTime = details.seekTime;
                     }
@@ -1173,37 +901,30 @@
             }
 
             try {
-                const db = await openDB('AudioBookDB_Files');
-                const tx = db.transaction('audioBlobs', 'readonly');
-                const store = tx.objectStore('audioBlobs');
-                const req = store.get(ep.fileId);
+                const audioBlob = await getAudioBlob(ep.fileId);
+                if (!audioBlob) {
+                    showToast('Không tìm thấy tệp audio trên thiết bị!');
+                    return;
+                }
 
-                req.onsuccess = function(e) {
-                    const audioBlob = e.target.result;
-                    if (!audioBlob) {
-                        showToast('Không tìm thấy tệp audio trên máy!');
-                        return;
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioElement.src = audioUrl;
+                audioElement.playbackRate = currentPlaybackSpeed;
+
+                const savedTime = parseFloat(localStorage.getItem(`history_${currentStoryId}_${currentEpisodeIndex}`) || '0');
+                
+                audioElement.onloadedmetadata = () => {
+                    if (savedTime > 5) {
+                        pendingHistoryTime = savedTime;
+                        document.getElementById('historyBannerText').textContent = `📜 Lịch sử: ${formatTime(savedTime)}`;
+                        document.getElementById('historyBanner').style.display = 'flex';
                     }
-
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioElement.src = audioUrl;
-                    audioElement.playbackRate = currentPlaybackSpeed;
-
-                    const savedTime = parseFloat(localStorage.getItem(`history_${currentStoryId}_${currentEpisodeIndex}`) || '0');
-                    
-                    audioElement.onloadedmetadata = () => {
-                        if (savedTime > 5) {
-                            pendingHistoryTime = savedTime;
-                            document.getElementById('historyBannerText').textContent = `📜 Lịch sử: ${formatTime(savedTime)}`;
-                            document.getElementById('historyBanner').style.display = 'flex';
-                        }
-                    };
-
-                    audioElement.play().catch(err => {
-                        console.error('Autoplay bị chặn:', err);
-                        showToast('Bấm nút Play để phát.');
-                    });
                 };
+
+                audioElement.play().catch(err => {
+                    console.error('Autoplay bị chặn:', err);
+                    showToast('Bấm nút Play để phát.');
+                });
             } catch (err) {
                 console.error(err);
                 showToast('Lỗi tải tệp âm thanh!');
@@ -1261,15 +982,6 @@
             showToast(`Đã áp dụng tốc độ: ${speed}x`);
         }
 
-        function applyCustomSpeed() {
-            const val = parseFloat(document.getElementById('customSpeedInput').value);
-            if (!isNaN(val) && val >= 0.5 && val <= 4.0) {
-                setPlaybackSpeed(val);
-            } else {
-                showToast('Vui lòng nhập tốc độ từ 0.5 đến 4.0');
-            }
-        }
-
         function openSleepTimerModal() {
             closeAllModals();
             document.getElementById('modalOverlay').classList.add('active');
@@ -1297,15 +1009,6 @@
 
             closeAllModals();
             showToast(`Đã hẹn giờ tắt sau ${minutes} phút`);
-        }
-
-        function applyCustomSleepTimer() {
-            const mins = parseInt(document.getElementById('customMinutesInput').value, 10);
-            if (!isNaN(mins) && mins > 0) {
-                startSleepTimer(mins);
-            } else {
-                showToast('Vui lòng nhập số phút hợp lệ!');
-            }
         }
 
         function cancelSleepTimer() {
@@ -1344,7 +1047,6 @@
             loadAndPlayCurrentEpisode();
         }
 
-        // Tùy chỉnh bố cục giao diện
         let isCustomizing = false;
         let selectedElementId = null;
         let elementConfigs = JSON.parse(localStorage.getItem('playerElementConfigs') || '{}');
