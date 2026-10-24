@@ -212,7 +212,6 @@
             background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent);
             padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;
             box-shadow: 0 4px 15px var(--shadow-color); pointer-events: auto; backdrop-filter: blur(10px);
-            cursor: grab;
         }
 
         .history-banner {
@@ -352,12 +351,14 @@
             color: var(--text-primary); padding: 12px; border-radius: 12px; font-size: 13px;
             font-family: var(--font-main); outline: none;
         }
+        .form-input:focus { border-color: var(--accent); }
 
         .submit-btn {
             width: 100%; background: var(--accent); color: #ffffff; border: none;
             padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 700;
             font-family: var(--font-main); cursor: pointer; margin-top: 6px;
         }
+        .submit-btn:active { transform: scale(0.98); }
 
         .episode-list-item {
             padding: 12px; background: var(--card-bg); border: 1px solid var(--card-border);
@@ -403,9 +404,7 @@
             <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </a>
         <div class="header-actions">
-            <button class="icon-btn" onclick="openBgMusicMenuModal()" title="Cài đặt nhạc nền">
-                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            </button>
+            <!-- Đã xóa nút thêm nhạc nền ở đây theo yêu cầu -->
             <button class="icon-btn" id="layoutToggleBtn" onclick="toggleLayoutCustomizer()" title="Tùy chỉnh phần tử giao diện">
                 <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
@@ -422,7 +421,8 @@
     </div>
 
     <div class="floating-alerts-container">
-        <div class="sleep-timer-badge" id="sleepTimerBadge" draggable="true">
+        <!-- Đồng hồ hiển thị thời gian hẹn giờ theo dạng X:Y:Z -->
+        <div class="sleep-timer-badge" id="sleepTimerBadge">
             <span>⏳ <span id="sleepCountdownText">0:00:00</span></span>
         </div>
 
@@ -484,42 +484,7 @@
     <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
 
-    <div class="bottom-sheet" id="bgMusicMenuSheet">
-        <div class="sheet-header">
-            <h3 class="sheet-title">Cài Đặt Nhạc Nền</h3>
-            <button class="close-btn" onclick="closeAllModals()">&times;</button>
-        </div>
-        <button class="sheet-option-btn" onclick="openBgMusicAddSheet()">Thêm nhạc nền mới</button>
-        <button class="sheet-option-btn" onclick="openBgMusicListSheet()">Danh sách nhạc đã thêm</button>
-    </div>
-
-    <div class="bottom-sheet" id="bgMusicAddSheet">
-        <div class="sheet-header">
-            <h3 class="sheet-title">Thêm Tệp Nhạc Nền (MP3)</h3>
-            <button class="close-btn" onclick="closeAllModals()">&times;</button>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Tên nhạc nền</label>
-            <input type="text" class="form-input" id="bgMusicNameInput" placeholder="Nhập tên nhạc nền...">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Chọn tệp MP3</label>
-            <input type="file" class="form-input" id="bgMusicFileInput" accept="audio/mp3, audio/*">
-        </div>
-        <button class="submit-btn" onclick="saveNewBgMusicTrack()">Lưu & Thêm</button>
-        <button class="submit-btn" style="background: transparent; border: 1px solid var(--card-border); color: var(--text-primary); margin-top: 8px;" onclick="openBgMusicMenuModal()">Quay lại</button>
-    </div>
-
-    <div class="bottom-sheet" id="bgMusicListSheet">
-        <div class="sheet-header" style="display: flex; align-items: center; justify-content: space-between;">
-            <h3 class="sheet-title" style="margin: 0;">Danh Sách Nhạc Nền</h3>
-        </div>
-        <div class="form-group" style="margin-top: 12px;">
-            <div id="bgMusicListContainer" style="max-height: 32vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-        <button class="submit-btn" onclick="closeAllModals()">Xong</button>
-    </div>
-
+    <!-- Modal Tốc Độ (Có ô nhập tùy chỉnh bất kỳ ví dụ 1.05x) -->
     <div class="bottom-sheet" id="speedModalSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Tốc Độ Phát Audio</h3>
@@ -530,8 +495,17 @@
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(1.25)">1.25x - Hơi nhanh</button>
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(1.5)">1.5x - Nhanh</button>
         <button class="sheet-option-btn" onclick="setPlaybackSpeed(2.0)">2.0x - Siêu tốc</button>
+        
+        <div class="form-group" style="margin-top: 14px;">
+            <label class="form-label">Hoặc nhập tốc độ tùy chỉnh (VD: 1.05)</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" step="0.01" min="0.25" max="4.0" class="form-input" id="customSpeedInput" placeholder="VD: 1.05">
+                <button class="submit-btn" style="margin-top: 0; width: 110px;" onclick="applyCustomSpeed()">Áp dụng</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Modal Hẹn Giờ (Nhập số phút tính theo phút) -->
     <div class="bottom-sheet" id="sleepTimerSheet">
         <div class="sheet-header">
             <h3 class="sheet-title">Hẹn Giờ Tắt Audio</h3>
@@ -541,6 +515,15 @@
         <button class="sheet-option-btn" onclick="startSleepTimer(15)">Sau 15 phút</button>
         <button class="sheet-option-btn" onclick="startSleepTimer(30)">Sau 30 phút</button>
         <button class="sheet-option-btn" onclick="startSleepTimer(60)">Sau 60 phút</button>
+
+        <div class="form-group" style="margin-top: 14px;">
+            <label class="form-label">Nhập số phút hẹn giờ tùy ý</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" min="1" step="any" class="form-input" id="customMinutesInput" placeholder="VD: 10 (phút)">
+                <button class="submit-btn" style="margin-top: 0; width: 110px;" onclick="applyCustomSleepTimer()">Bắt đầu</button>
+            </div>
+        </div>
+
         <button class="submit-btn" style="background: rgba(244,63,94,0.2); color: var(--accent); margin-top: 10px;" onclick="cancelSleepTimer()">Hủy hẹn giờ</button>
     </div>
 
@@ -587,7 +570,6 @@
             });
         }
 
-        // Lấy tệp audio từ OPFS hoặc IndexedDB audioBlobs
         async function getAudioBlob(fileId) {
             try {
                 const root = await navigator.storage.getDirectory();
@@ -669,23 +651,11 @@
         let currentStory = null;
 
         let audioElement = new Audio();
-
-        let audioCtx = null;
-        let bgGainNode = null;
-        let bgAudioBuffer = null;
-        let bgBufferSource = null;
-        let isWebAudioInitialized = false;
-        let isBgPlaying = false;
-
         let currentPlaybackSpeed = parseFloat(localStorage.getItem('globalAudioSpeed') || '1.0');
         let sleepTimerInterval = null;
         let sleepTimerRemainingSeconds = 0;
         let pendingHistoryTime = 0;
         let isUserSeeking = false;
-
-        let bgMusicList = JSON.parse(localStorage.getItem('customBgMusicList') || '[]');
-        let activeBgMusicId = localStorage.getItem('activeBgMusicId') || '';
-        let bgMusicVolume = parseFloat(localStorage.getItem('bgMusicVolume') || '0.5');
 
         window.addEventListener('DOMContentLoaded', async () => {
             initTheme();
@@ -693,10 +663,6 @@
 
             audioElement.playbackRate = currentPlaybackSpeed;
             document.getElementById('speedLabelBtn').textContent = `Tốc độ: ${currentPlaybackSpeed}x`;
-
-            if (activeBgMusicId) {
-                loadBgMusicBufferToMemory(activeBgMusicId);
-            }
 
             await loadStoryAndPlay();
 
@@ -724,13 +690,6 @@
             });
 
             audioElement.addEventListener('play', () => {
-                initWebAudioIfNeeded();
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                if (activeBgMusicId && !isBgPlaying) {
-                    startBgMusicSourceNode();
-                }
                 document.getElementById('playIcon').style.display = 'none';
                 document.getElementById('pauseIcon').style.display = 'block';
                 if ('mediaSession' in navigator) {
@@ -739,7 +698,6 @@
             });
 
             audioElement.addEventListener('pause', () => {
-                stopBgMusicBuffer();
                 document.getElementById('playIcon').style.display = 'block';
                 document.getElementById('pauseIcon').style.display = 'none';
                 if ('mediaSession' in navigator) {
@@ -749,7 +707,6 @@
 
             audioElement.addEventListener('ended', () => {
                 savePlaybackHistory(0);
-                stopBgMusicBuffer();
                 if (currentStory && currentStory.episodes && currentEpisodeIndex < currentStory.episodes.length - 1) {
                     currentEpisodeIndex++;
                     localStorage.setItem('currentEpisodeIndex', currentEpisodeIndex);
@@ -762,62 +719,6 @@
                 }
             });
         });
-
-        function initWebAudioIfNeeded() {
-            if (isWebAudioInitialized) return;
-            try {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                if (AudioContextClass) {
-                    audioCtx = new AudioContextClass();
-                    bgGainNode = audioCtx.createGain();
-                    bgGainNode.gain.setValueAtTime(bgMusicVolume, audioCtx.currentTime);
-                    bgGainNode.connect(audioCtx.destination);
-                    isWebAudioInitialized = true;
-                }
-            } catch (e) {}
-        }
-
-        async function loadBgMusicBufferToMemory(id) {
-            if (!id) {
-                bgAudioBuffer = null;
-                stopBgMusicBuffer();
-                return;
-            }
-            const track = bgMusicList.find(t => t.id === id);
-            if (!track) return;
-            const blob = await getAudioBlob(track.fileId);
-            if (blob) {
-                initWebAudioIfNeeded();
-                const arrayBuffer = await blob.arrayBuffer();
-                audioCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
-                    bgAudioBuffer = decodedBuffer;
-                    if (!audioElement.paused) startBgMusicSourceNode();
-                });
-            }
-        }
-
-        function startBgMusicSourceNode() {
-            stopBgMusicBuffer();
-            if (!bgAudioBuffer || !activeBgMusicId || audioElement.paused) return;
-            try {
-                initWebAudioIfNeeded();
-                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-                bgBufferSource = audioCtx.createBufferSource();
-                bgBufferSource.buffer = bgAudioBuffer;
-                bgBufferSource.loop = true;
-                bgBufferSource.connect(bgGainNode);
-                bgBufferSource.start(0);
-                isBgPlaying = true;
-            } catch (e) {}
-        }
-
-        function stopBgMusicBuffer() {
-            if (bgBufferSource) {
-                try { bgBufferSource.stop(); bgBufferSource.disconnect(); } catch (e) {}
-                bgBufferSource = null;
-            }
-            isBgPlaying = false;
-        }
 
         function updateSliderFill(val) {
             const slider = document.getElementById('progressSlider');
@@ -953,6 +854,15 @@
             return `${hrs}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
+        // Định dạng thời gian X:Y:Z (Giờ : Phút : Giây) cho hẹn giờ
+        function formatTimerXYZ(totalSeconds) {
+            if (isNaN(totalSeconds) || totalSeconds <= 0) return "0:0:0";
+            const hrs = Math.floor(totalSeconds / 3600);
+            const mins = Math.floor((totalSeconds % 3600) / 60);
+            const secs = Math.floor(totalSeconds % 60);
+            return `${hrs}:${mins}:${secs}`;
+        }
+
         function togglePlayPause() {
             if (audioElement.paused) {
                 audioElement.play();
@@ -969,6 +879,7 @@
 
         function openSpeedModal() {
             closeAllModals();
+            document.getElementById('customSpeedInput').value = currentPlaybackSpeed;
             document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('speedModalSheet').classList.add('active');
         }
@@ -982,15 +893,25 @@
             showToast(`Đã áp dụng tốc độ: ${speed}x`);
         }
 
+        function applyCustomSpeed() {
+            const val = parseFloat(document.getElementById('customSpeedInput').value);
+            if (!isNaN(val) && val >= 0.25 && val <= 4.0) {
+                setPlaybackSpeed(val);
+            } else {
+                showToast('Vui lòng nhập tốc độ hợp lệ từ 0.25 đến 4.0!');
+            }
+        }
+
         function openSleepTimerModal() {
             closeAllModals();
+            document.getElementById('customMinutesInput').value = '';
             document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('sleepTimerSheet').classList.add('active');
         }
 
         function startSleepTimer(minutes) {
             if (sleepTimerInterval) clearInterval(sleepTimerInterval);
-            sleepTimerRemainingSeconds = minutes * 60;
+            sleepTimerRemainingSeconds = Math.round(minutes * 60);
             
             document.getElementById('sleepTimerBadge').style.display = 'flex';
             updateSleepTimerDisplay();
@@ -1011,6 +932,15 @@
             showToast(`Đã hẹn giờ tắt sau ${minutes} phút`);
         }
 
+        function applyCustomSleepTimer() {
+            const mins = parseFloat(document.getElementById('customMinutesInput').value);
+            if (!isNaN(mins) && mins > 0) {
+                startSleepTimer(mins);
+            } else {
+                showToast('Vui lòng nhập số phút hợp lệ!');
+            }
+        }
+
         function cancelSleepTimer() {
             if (sleepTimerInterval) clearInterval(sleepTimerInterval);
             sleepTimerInterval = null;
@@ -1020,7 +950,8 @@
         }
 
         function updateSleepTimerDisplay() {
-            document.getElementById('sleepCountdownText').textContent = formatTime(sleepTimerRemainingSeconds);
+            // Hiển thị dạng X:Y:Z (Giờ : Phút : Giây)
+            document.getElementById('sleepCountdownText').textContent = formatTimerXYZ(sleepTimerRemainingSeconds);
         }
 
         function openPlaylistModal() {
